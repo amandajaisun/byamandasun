@@ -1,4 +1,64 @@
 <!DOCTYPE html>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: white;
+            font-family: nyt-imperial, georgia, 'times new roman', times, serif;
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        #nav-pane {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 16px;
+            z-index: 100;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: #607466;
+            font-size: 12px;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: #343E3D;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Pane -->
+    <nav id="nav-pane">
+        <a href="index.html" class="nav-item active" data-key="1">1</a>
+        <a href="canvas.html" class="nav-item" data-key="2">2</a>
+    </nav>
+
+    <script>
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                if (item.dataset.key === e.key) {
+                    window.location.href = item.href;
+                }
+            });
+        });
+    </script>
+</body>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -66,16 +126,16 @@ let yOutline = [];
 let tempx, tempy;
 
 function setup() {
-    createCanvas(windowWidth, windowHeight);
+    let canvas = createCanvas(windowWidth, 600);
     canvasWidth = width;
     canvasHeight = height;
-
+    
     frameRate(30);
-
+    
     leafColor = color(100, 100, 100, 240);
     branchColor = color(100, 100, 100);
     skyColor = color(255, 255, 255);
-
+    
     initializeTreeValues();
     windDirection = 0;
     windVelocity = 0;
@@ -89,17 +149,20 @@ function setup() {
 function draw() {
     if (!pauseWind) {
         updateWind();
-
+        
         for (let i = 0; i < treeNumber; i++) {
             branches[i].rotateDueToWind();
         }
-
+        
         redrawTrees();
-
+        
         if (drawWind) {
             drawWindLine();
         }
     }
+    
+    // Always draw the control panel
+    drawControlPanel();
 }
 
 function redrawTrees() {
@@ -114,8 +177,8 @@ function drawBranches() {
     stroke(branchColor);
     for (let i = 0; i < treeNumber; i++) {
         branches[i].drawBranch([
-            (1 + i) + (canvasWidth / 2),
-            canvasHeight - 80
+            (1 + i) + (canvasWidth / 2), 
+            canvasHeight - 50 // Moved up from bottom
         ]);
     }
 }
@@ -125,7 +188,7 @@ function drawLeavesFunc() {
     fill(leafColor);
     for (let i = 0; i < treeNumber; i++) {
         branches[i].drawLeaves([
-            (1 + i) * (canvasWidth / (1 + treeNumber)),
+            (1 + i) * (canvasWidth / (1 + treeNumber)), 
             canvasHeight
         ]);
     }
@@ -138,21 +201,65 @@ function drawWindLine() {
     let dy = 100;
     let lineLength = 150;
     line(dx, dy, dx + lineLength * windVelocity * cos(windDirection), dy + lineLength * windVelocity * sin(windDirection));
-
+    
     // Draw origin point
     noStroke();
     fill('#6e956c');
     ellipse(dx, dy, 12, 12);
 }
 
+function drawControlPanel() {
+    // Semi-transparent background
+    fill(255, 255, 255, 230);
+    noStroke();
+    rect(10, 10, 300, 280, 5);
+    
+    // Title
+    fill(0);
+    textSize(18);
+    textAlign(LEFT, TOP);
+    
+    // Instructions
+    textSize(10);
+    let y = 50;
+    let lineHeight = 22;
+    
+    text('↑↓  wind speed', 20, y);
+    y += lineHeight;
+    text('←→  wind direction', 20, y);
+    y += lineHeight;
+    text('space  regenerate tree', 20, y);
+    y += lineHeight;
+    text('click  regenerate tree', 20, y);
+    y += lineHeight;
+    text('p  pause play', 20, y);
+    y += lineHeight;
+    text('m  wind indicator', 20, y);
+    y += lineHeight;
+    text('l  leaves', 20, y);
+    y += lineHeight;
+    text('+-  leaf transparency', 20, y);
+    
+    // Status
+    y += lineHeight + 5;
+    fill(100);
+    //y += lineHeight;
+    
+    text('speed: ' + windVelocity.toFixed(1), 20, y);
+    //y += lineHeight;
+    //text('wind: ' + (pauseWind ? 'Paused' : 'Active'), 20, y);
+    //y += lineHeight;
+    //text('Leaves: ' + (drawLeaves ? 'Visible' : 'Hidden'), 20, y);
+}
+
 function initializeTreeValues() {
     pauseWind = false;
     drawWind = false;
     drawLeaves = true;
-
+    
     nSegments = 20;
-    totalBranchLength = 300;
-    maxBranchThickness = 6;
+    totalBranchLength = 300; // Reduced from 500
+    maxBranchThickness = 7; // Reduced from 9
     maxBranchSizeForLeaves = 5;
     minBranchThickness = 2;
     minSpawnDistance = 0.1;
@@ -162,7 +269,7 @@ function initializeTreeValues() {
     maxdThetaSplit = PI / 5;
     maxdThetaWander = PI / 5;
     dBranchSize = 0.2;
-
+    
     minLength = 3;
     maxLength = 20;
     minWidth = 0.4;
@@ -184,7 +291,7 @@ function keyPressed() {
         windDirection = random(TWO_PI);
         redrawTrees();
     }
-
+    
     // Arrow keys for wind speed
     if (keyCode === UP_ARROW && !pauseWind && windVelocity < 8) {
         windVelocity++;
@@ -197,7 +304,7 @@ function keyPressed() {
             pauseWind = !pauseWind;
         }
     }
-
+    
     // Arrow keys for wind direction
     if (keyCode === LEFT_ARROW) {
         windDirection -= 0.1; // Rotate counter-clockwise
@@ -207,7 +314,7 @@ function keyPressed() {
         windDirection += 0.1; // Rotate clockwise
         windDirection = (windDirection + TWO_PI) % TWO_PI;
     }
-
+    
     redrawTrees();
 }
 
@@ -216,7 +323,7 @@ function keyTyped() {
         drawWind = !drawWind;
         console.log(drawWind);
     }
-    if (key === 'l') {
+    if (key === '1') {
         drawLeaves = !drawLeaves;
     }
     if (key === 'p') {
@@ -261,17 +368,17 @@ class Branch {
         this.thetas[0] = this.thetaO;
         this.x = 0;
         this.y = 0;
-
+        
         for (let i = 1; i < nSegments; i++) {
             this.thetas[i] = this.thetas[i - 1] + random(-maxdThetaWander, maxdThetaWander);
         }
-
+        
         // Spawn baby branches
         for (let i = 1; i < nSegments; i++) {
             if (startingThicknessO * (1 - i / nSegments) > minBranchThickness &&
                 i / nSegments > minSpawnDistance &&
                 random(1) <= branchSpawnOdds) {
-
+                
                 let dThetaSign = randomSign();
                 this.myChildren.push(
                     new Branch(i,
@@ -279,7 +386,7 @@ class Branch {
                         totalLength * (1 - i / nSegments) * random(1 - dBranchSize, 1 + dBranchSize),
                         startingThicknessO * (1 - i / nSegments))
                 );
-
+                
                 if (random(1) <= branchSpawnOddsOfSecond) {
                     this.myChildren.push(
                         new Branch(i,
@@ -290,16 +397,16 @@ class Branch {
                 }
             }
         }
-
+        
         // Add leaves
         for (let i = 1; i < nSegments; i++) {
-            if (startingThicknessO * (1 - i / nSegments) < maxBranchSizeForLeaves &&
+            if (startingThicknessO * (1 - i / nSegments) < maxBranchSizeForLeaves && 
                 random(1) < leafSpawnOdds) {
                 this.myLeaves.push(new Leaf(this.thetas[i], i));
             }
         }
     }
-
+    
     getCoordsOf(n) {
         let x2 = this.x;
         let y2 = this.y;
@@ -309,59 +416,59 @@ class Branch {
         }
         return [x2, y2];
     }
-
+    
     rotate(dTheta) {
         for (let i = 0; i < nSegments; i++) {
             this.thetas[i] += dTheta;
         }
-
+        
         for (let i = 0; i < this.myLeaves.length; i++) {
             this.myLeaves[i].rotate(dTheta);
         }
-
+        
         for (let i = 0; i < this.myChildren.length; i++) {
             this.myChildren[i].rotate(dTheta);
         }
     }
-
+    
     rotateDueToWind() {
         let dThetaWind = this.thetas[0] - windDirection;
         let dThetaBranch = this.thetas[0] - this.thetaO;
-
+        
         if (dThetaWind > PI) {
             dThetaWind = -(TWO_PI - dThetaWind);
         } else if (dThetaWind < -PI) {
             dThetaWind = TWO_PI + dThetaWind;
         }
-
+        
         if (dThetaBranch > PI) {
             dThetaBranch = -(TWO_PI - dThetaBranch);
         } else if (dThetaBranch < -PI) {
             dThetaBranch = TWO_PI + dThetaBranch;
         }
-
+        
         let forceOfBranch = -(this.thetas[0] - this.thetaO) * ((this.startingThickness / maxBranchThickness) * 1.1);
         let forceOfWind = -windVelocity * sin(dThetaWind) / 10;
         let moveAmount = noise(random(16, 24)) * 50;
-
+        
         this.rotate((forceOfBranch + forceOfWind) / moveAmount);
-
+        
         for (let i = 0; i < this.myLeaves.length; i++) {
             this.myLeaves[i].moveFromWind();
         }
-
+        
         for (let i = 0; i < this.myChildren.length; i++) {
             this.myChildren[i].rotateDueToWind();
         }
     }
-
+    
     drawBranch(coords) {
         this.x = coords[0];
         this.y = coords[1];
         let x1 = this.x;
         let y1 = this.y;
         let x2, y2;
-
+        
         for (let i = 0; i < nSegments; i++) {
             x2 = x1 + this.segmentLength * cos(this.thetas[i]);
             y2 = y1 + this.segmentLength * sin(this.thetas[i]);
@@ -370,17 +477,17 @@ class Branch {
             x1 = x2;
             y1 = y2;
         }
-
+        
         for (let i = 0; i < this.myChildren.length; i++) {
             this.myChildren[i].drawBranch(this.getCoordsOf(this.myChildren[i].index));
         }
     }
-
+    
     drawLeaves(coords) {
         for (let i = 0; i < this.myLeaves.length; i++) {
             this.myLeaves[i].draw(this.getCoordsOf(this.myLeaves[i].index));
         }
-
+        
         for (let i = 0; i < this.myChildren.length; i++) {
             this.myChildren[i].drawLeaves(coords);
         }
@@ -399,11 +506,11 @@ function randomSign() {
 function defineLeafOutline() {
     xOutline = new Array(nLeafPoints);
     yOutline = new Array(nLeafPoints);
-
+    
     for (let i = 0; i <= nLeafPoints / 2; i++) {
         xOutline[i] = 2 * i / nLeafPoints;
         yOutline[i] = (-pow((xOutline[i] - 0.5), 2) + 0.25);
-
+        
         if (i > 0 && i <= nLeafPoints / 2) {
             xOutline[nLeafPoints - i] = xOutline[i];
             yOutline[nLeafPoints - i] = -yOutline[i];
@@ -429,27 +536,27 @@ class Leaf {
         this.myLength = random(minLength, maxLength);
         this.index = indexO;
     }
-
+    
     moveFromWind() {
         let dThetaWind = ((this.thetaO + this.dTheta) - windDirection) % TWO_PI;
-
+        
         if (dThetaWind > PI) {
             dThetaWind = -(TWO_PI - dThetaWind);
         } else if (dThetaWind < -PI) {
             dThetaWind = TWO_PI + dThetaWind;
         }
-
+        
         this.thetaO = (this.thetaO + TWO_PI) % TWO_PI;
         let forceOfLeaf = -(this.dTheta) / PI;
         let forceOfWind = -windVelocity * sin(dThetaWind);
         let LeafForce = (noise(random(20, 30)) * 30);
         this.dTheta += (forceOfLeaf + forceOfWind) / LeafForce;
     }
-
+    
     rotate(deltaTheta) {
         this.dTheta += deltaTheta;
     }
-
+    
     draw(coord) {
         let x = coord[0];
         let y = coord[1];
@@ -462,17 +569,11 @@ function updateWind() {
     velOff += velIncrement;
     windspeed += windspeedIncrement;
     windDirection = (windDirection - 0.001 + TWO_PI) % TWO_PI;
-
+    
     if (windspeed >= limit) {
         windspeed -= windspeedIncrement;
     }
     windVelocity = (windspeed) * noise(velOff) - 1;
-}
-
-function windowResized() {
-    resizeCanvas(windowWidth, windowHeight);
-    canvasWidth = width;
-    canvasHeight = height;
 }
     </script>
 </body>

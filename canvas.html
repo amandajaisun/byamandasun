@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: white;
+            overflow: hidden;
+            cursor: grab;
+            user-select: none;
+            font-family: nyt-imperial, georgia, 'times new roman', times, serif;
+        }
+
+        body.grabbing {
+            cursor: grabbing;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #canvas {
+            width: 4000px;
+            height: 4000px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: transform 0.05s ease-out;
+            transform-origin: 0 0;
+        }
+
+        .image-item {
+            position: absolute;
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Navigation */
+        #nav-pane {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 16px;
+            z-index: 100;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: #607466;
+            font-size: 12px;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: #343E3D;
+        }
+
+        /* Zoom overlay */
+        #zoom-overlay {
+            position: fixed;
+            inset: 0;
+            background: white;
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: default;
+        }
+
+        #zoom-overlay.active {
+            display: flex;
+        }
+
+        #zoom-overlay img {
+            max-width: 80%;
+            max-height: 80%;
+            object-fit: contain;
+        }
+
+        #escape-hint {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            color: #607466;
+            font-size: 12px;
+            z-index: 201;
+            display: none;
+        }
+
+        #escape-hint.visible {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container">
+        <div id="canvas">
+            <!-- Images will be added here -->
+        </div>
+    </div>
+
+    <!-- Zoom overlay -->
+    <div id="zoom-overlay">
+        <img id="zoom-image" src="" alt="">
+    </div>
+
+    <!-- Escape hint -->
+    <div id="escape-hint">hit esc</div>
+
+    <!-- Navigation Pane -->
+    <nav id="nav-pane">
+        <a href="index.html" class="nav-item" data-key="1">1</a>
+        <a href="canvas.html" class="nav-item active" data-key="2">2</a>
+    </nav>
+
+    <script>
+        // ========================================
+        // CONFIGURE YOUR IMAGES HERE
+        // ========================================
+        const images = [
+            // Add your images like this:
+            // { src: 'path/to/your/image1.jpg', width: 400, height: 300 },
+            // { src: 'path/to/your/image2.png', width: 500, height: 400 },
+            
+            
+            // Placeholder images (replace these with your own):
+            { src: 'imgs/animation/Puppy-GIF.gif', width: 400, height: 500 },
+            { src: 'imgs/animation/cervest_animation_folder.gif', width: 400, height: 400 },
+            { src: 'imgs/id/box.jpg', width: 400, height: 400 },
+            { src: 'imgs/illustration/I_miss_empty_nesting.png', width: 450, height: 350 },
+            { src: 'imgs/illustration/I-m_Sick_Of_This_Clean_Air.png', width: 380, height: 420 },
+            { src: 'imgs/illustration/IMG_0024.jpg', width: 420, height: 600 },
+            { src: 'imgs/illustration/kegshirts5.png', width: 420, height: 320 },
+            { src: 'imgs/illustration/Tanning_In_2020-1.png', width: 500, height: 600 },
+            { src: 'imgs/illustration/Phase_4_Can-t_Come_Quicker.png', width: 500, height: 600 },
+        ];
+        // ========================================
+
+        const canvas = document.getElementById('canvas');
+        const canvasContainer = document.getElementById('canvas-container');
+
+        let scale = 1;
+        let isDragging = false;
+        let startX, startY;
+        let currentX = 0;
+        let currentY = 0;
+
+        // Generate random positions for images
+        function getRandomPosition(index, total) {
+            const canvasSize = 4000;
+            const angle = (index / total) * Math.PI * 2;
+            const radius = 600 + Math.random() * 800;
+            
+            return {
+                x: canvasSize / 2 + Math.cos(angle) * radius + (Math.random() - 0.5) * 400,
+                y: canvasSize / 2 + Math.sin(angle) * radius + (Math.random() - 0.5) * 400
+            };
+        }
+
+        // Create image elements
+        images.forEach((img, index) => {
+            const pos = getRandomPosition(index, images.length);
+            const imageEl = document.createElement('div');
+            imageEl.className = 'image-item';
+            imageEl.style.left = `${pos.x}px`;
+            imageEl.style.top = `${pos.y}px`;
+            imageEl.style.width = `${img.width}px`;
+            imageEl.style.height = `${img.height}px`;
+            
+            const imgTag = document.createElement('img');
+            imgTag.src = img.src;
+            imgTag.alt = `Image ${index + 1}`;
+            imgTag.draggable = false;
+            
+            imageEl.appendChild(imgTag);
+            canvas.appendChild(imageEl);
+            
+            // Add click handler for zoom
+            imageEl.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showZoomedImage(img.src);
+            });
+        });
+
+        function updateTransform() {
+            canvas.style.transform = `translate(${currentX}px, ${currentY}px) scale(${scale})`;
+        }
+
+        // Pan functionality
+        canvasContainer.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.image-item')) return;
+            isDragging = true;
+            startX = e.clientX - currentX;
+            startY = e.clientY - currentY;
+            document.body.classList.add('grabbing');
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            currentX = e.clientX - startX;
+            currentY = e.clientY - startY;
+            updateTransform();
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            document.body.classList.remove('grabbing');
+        });
+
+        // Zoom functionality
+        const zoomOverlay = document.getElementById('zoom-overlay');
+        const zoomImage = document.getElementById('zoom-image');
+        const escapeHint = document.getElementById('escape-hint');
+
+        function showZoomedImage(src) {
+            zoomImage.src = src;
+            zoomOverlay.classList.add('active');
+            escapeHint.classList.add('visible');
+        }
+
+        function hideZoomedImage() {
+            zoomOverlay.classList.remove('active');
+            escapeHint.classList.remove('visible');
+            zoomImage.src = '';
+        }
+
+        zoomOverlay.addEventListener('click', hideZoomedImage);
+
+        // Initial render - center and scale to show all images
+        function centerToShowAllImages() {
+            // Calculate bounds of all images
+            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+            
+            const imageElements = document.querySelectorAll('.image-item');
+            imageElements.forEach(el => {
+                const left = parseFloat(el.style.left);
+                const top = parseFloat(el.style.top);
+                const width = parseFloat(el.style.width);
+                const height = parseFloat(el.style.height);
+                
+                minX = Math.min(minX, left);
+                minY = Math.min(minY, top);
+                maxX = Math.max(maxX, left + width);
+                maxY = Math.max(maxY, top + height);
+            });
+            
+            // Calculate content dimensions
+            const contentWidth = maxX - minX;
+            const contentHeight = maxY - minY;
+            const contentCenterX = (minX + maxX) / 2;
+            const contentCenterY = (minY + maxY) / 2;
+            
+            // Calculate viewport dimensions
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            
+            // Calculate scale to fit all images with padding
+            const scaleX = viewportWidth / contentWidth;
+            const scaleY = viewportHeight / contentHeight;
+            scale = Math.min(scaleX, scaleY) * 0.9; // 90% to add padding
+            
+            // Center the canvas so all images are visible
+            currentX = viewportWidth / 2 - contentCenterX * scale;
+            currentY = viewportHeight / 2 - contentCenterY * scale;
+            
+            updateTransform();
+        }
+        
+        centerToShowAllImages();
+        
+        // Recenter on window resize
+        window.addEventListener('resize', centerToShowAllImages);
+
+        // Prevent image dragging
+        document.querySelectorAll('img').forEach(img => {
+            img.addEventListener('dragstart', (e) => e.preventDefault());
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            
+            // Escape key to close zoom
+            if (e.key === 'Escape') {
+                hideZoomedImage();
+                return;
+            }
+            
+            // Number keys for navigation
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                if (item.dataset.key === e.key) {
+                    window.location.href = item.href;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
