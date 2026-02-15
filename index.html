@@ -66,16 +66,16 @@ let yOutline = [];
 let tempx, tempy;
 
 function setup() {
-    let canvas = createCanvas(windowWidth, 600);
+    createCanvas(windowWidth, windowHeight);
     canvasWidth = width;
     canvasHeight = height;
-    
+
     frameRate(30);
-    
+
     leafColor = color(100, 100, 100, 240);
     branchColor = color(100, 100, 100);
     skyColor = color(255, 255, 255);
-    
+
     initializeTreeValues();
     windDirection = 0;
     windVelocity = 0;
@@ -89,20 +89,17 @@ function setup() {
 function draw() {
     if (!pauseWind) {
         updateWind();
-        
+
         for (let i = 0; i < treeNumber; i++) {
             branches[i].rotateDueToWind();
         }
-        
+
         redrawTrees();
-        
+
         if (drawWind) {
             drawWindLine();
         }
     }
-    
-    // Always draw the control panel
-    drawControlPanel();
 }
 
 function redrawTrees() {
@@ -117,8 +114,8 @@ function drawBranches() {
     stroke(branchColor);
     for (let i = 0; i < treeNumber; i++) {
         branches[i].drawBranch([
-            (1 + i) + (canvasWidth / 2), 
-            canvasHeight - 50 // Moved up from bottom
+            (1 + i) + (canvasWidth / 2),
+            canvasHeight - 80
         ]);
     }
 }
@@ -128,7 +125,7 @@ function drawLeavesFunc() {
     fill(leafColor);
     for (let i = 0; i < treeNumber; i++) {
         branches[i].drawLeaves([
-            (1 + i) * (canvasWidth / (1 + treeNumber)), 
+            (1 + i) * (canvasWidth / (1 + treeNumber)),
             canvasHeight
         ]);
     }
@@ -141,69 +138,21 @@ function drawWindLine() {
     let dy = 100;
     let lineLength = 150;
     line(dx, dy, dx + lineLength * windVelocity * cos(windDirection), dy + lineLength * windVelocity * sin(windDirection));
-    
+
     // Draw origin point
     noStroke();
     fill('#6e956c');
     ellipse(dx, dy, 12, 12);
 }
 
-function drawControlPanel() {
-    // Semi-transparent background
-    fill(255, 255, 255, 230);
-    noStroke();
-    rect(10, 10, 300, 280, 5);
-    
-    // Title
-    fill(0);
-    textSize(18);
-    textAlign(LEFT, TOP);
-    text('Controls', 20, 20);
-    
-    // Instructions
-    textSize(14);
-    let y = 50;
-    let lineHeight = 22;
-    
-    text('↑ / ↓  Wind Speed', 20, y);
-    y += lineHeight;
-    text('← / →  Wind Direction', 20, y);
-    y += lineHeight;
-    text('SPACE  Regenerate Tree', 20, y);
-    y += lineHeight;
-    text('CLICK  Regenerate Tree', 20, y);
-    y += lineHeight;
-    text('P  Pause/Play', 20, y);
-    y += lineHeight;
-    text('M  Toggle Wind Indicator', 20, y);
-    y += lineHeight;
-    text('1  Toggle Leaves', 20, y);
-    y += lineHeight;
-    text('+ / -  Leaf Transparency', 20, y);
-    
-    // Status
-    y += lineHeight + 10;
-    textSize(14);
-    fill(100);
-    text('Status:', 20, y);
-    y += lineHeight;
-    
-    textSize(13);
-    text('Wind Speed: ' + windVelocity.toFixed(1), 20, y);
-    y += lineHeight;
-    text('Wind: ' + (pauseWind ? 'Paused' : 'Active'), 20, y);
-    y += lineHeight;
-    text('Leaves: ' + (drawLeaves ? 'Visible' : 'Hidden'), 20, y);
-}
-
 function initializeTreeValues() {
     pauseWind = false;
     drawWind = false;
     drawLeaves = true;
-    
+
     nSegments = 20;
-    totalBranchLength = 300; // Reduced from 500
-    maxBranchThickness = 7; // Reduced from 9
+    totalBranchLength = 300;
+    maxBranchThickness = 6;
     maxBranchSizeForLeaves = 5;
     minBranchThickness = 2;
     minSpawnDistance = 0.1;
@@ -213,7 +162,7 @@ function initializeTreeValues() {
     maxdThetaSplit = PI / 5;
     maxdThetaWander = PI / 5;
     dBranchSize = 0.2;
-    
+
     minLength = 3;
     maxLength = 20;
     minWidth = 0.4;
@@ -235,7 +184,7 @@ function keyPressed() {
         windDirection = random(TWO_PI);
         redrawTrees();
     }
-    
+
     // Arrow keys for wind speed
     if (keyCode === UP_ARROW && !pauseWind && windVelocity < 8) {
         windVelocity++;
@@ -248,7 +197,7 @@ function keyPressed() {
             pauseWind = !pauseWind;
         }
     }
-    
+
     // Arrow keys for wind direction
     if (keyCode === LEFT_ARROW) {
         windDirection -= 0.1; // Rotate counter-clockwise
@@ -258,7 +207,7 @@ function keyPressed() {
         windDirection += 0.1; // Rotate clockwise
         windDirection = (windDirection + TWO_PI) % TWO_PI;
     }
-    
+
     redrawTrees();
 }
 
@@ -267,7 +216,7 @@ function keyTyped() {
         drawWind = !drawWind;
         console.log(drawWind);
     }
-    if (key === '1') {
+    if (key === 'l') {
         drawLeaves = !drawLeaves;
     }
     if (key === 'p') {
@@ -312,17 +261,17 @@ class Branch {
         this.thetas[0] = this.thetaO;
         this.x = 0;
         this.y = 0;
-        
+
         for (let i = 1; i < nSegments; i++) {
             this.thetas[i] = this.thetas[i - 1] + random(-maxdThetaWander, maxdThetaWander);
         }
-        
+
         // Spawn baby branches
         for (let i = 1; i < nSegments; i++) {
             if (startingThicknessO * (1 - i / nSegments) > minBranchThickness &&
                 i / nSegments > minSpawnDistance &&
                 random(1) <= branchSpawnOdds) {
-                
+
                 let dThetaSign = randomSign();
                 this.myChildren.push(
                     new Branch(i,
@@ -330,7 +279,7 @@ class Branch {
                         totalLength * (1 - i / nSegments) * random(1 - dBranchSize, 1 + dBranchSize),
                         startingThicknessO * (1 - i / nSegments))
                 );
-                
+
                 if (random(1) <= branchSpawnOddsOfSecond) {
                     this.myChildren.push(
                         new Branch(i,
@@ -341,16 +290,16 @@ class Branch {
                 }
             }
         }
-        
+
         // Add leaves
         for (let i = 1; i < nSegments; i++) {
-            if (startingThicknessO * (1 - i / nSegments) < maxBranchSizeForLeaves && 
+            if (startingThicknessO * (1 - i / nSegments) < maxBranchSizeForLeaves &&
                 random(1) < leafSpawnOdds) {
                 this.myLeaves.push(new Leaf(this.thetas[i], i));
             }
         }
     }
-    
+
     getCoordsOf(n) {
         let x2 = this.x;
         let y2 = this.y;
@@ -360,59 +309,59 @@ class Branch {
         }
         return [x2, y2];
     }
-    
+
     rotate(dTheta) {
         for (let i = 0; i < nSegments; i++) {
             this.thetas[i] += dTheta;
         }
-        
+
         for (let i = 0; i < this.myLeaves.length; i++) {
             this.myLeaves[i].rotate(dTheta);
         }
-        
+
         for (let i = 0; i < this.myChildren.length; i++) {
             this.myChildren[i].rotate(dTheta);
         }
     }
-    
+
     rotateDueToWind() {
         let dThetaWind = this.thetas[0] - windDirection;
         let dThetaBranch = this.thetas[0] - this.thetaO;
-        
+
         if (dThetaWind > PI) {
             dThetaWind = -(TWO_PI - dThetaWind);
         } else if (dThetaWind < -PI) {
             dThetaWind = TWO_PI + dThetaWind;
         }
-        
+
         if (dThetaBranch > PI) {
             dThetaBranch = -(TWO_PI - dThetaBranch);
         } else if (dThetaBranch < -PI) {
             dThetaBranch = TWO_PI + dThetaBranch;
         }
-        
+
         let forceOfBranch = -(this.thetas[0] - this.thetaO) * ((this.startingThickness / maxBranchThickness) * 1.1);
         let forceOfWind = -windVelocity * sin(dThetaWind) / 10;
         let moveAmount = noise(random(16, 24)) * 50;
-        
+
         this.rotate((forceOfBranch + forceOfWind) / moveAmount);
-        
+
         for (let i = 0; i < this.myLeaves.length; i++) {
             this.myLeaves[i].moveFromWind();
         }
-        
+
         for (let i = 0; i < this.myChildren.length; i++) {
             this.myChildren[i].rotateDueToWind();
         }
     }
-    
+
     drawBranch(coords) {
         this.x = coords[0];
         this.y = coords[1];
         let x1 = this.x;
         let y1 = this.y;
         let x2, y2;
-        
+
         for (let i = 0; i < nSegments; i++) {
             x2 = x1 + this.segmentLength * cos(this.thetas[i]);
             y2 = y1 + this.segmentLength * sin(this.thetas[i]);
@@ -421,17 +370,17 @@ class Branch {
             x1 = x2;
             y1 = y2;
         }
-        
+
         for (let i = 0; i < this.myChildren.length; i++) {
             this.myChildren[i].drawBranch(this.getCoordsOf(this.myChildren[i].index));
         }
     }
-    
+
     drawLeaves(coords) {
         for (let i = 0; i < this.myLeaves.length; i++) {
             this.myLeaves[i].draw(this.getCoordsOf(this.myLeaves[i].index));
         }
-        
+
         for (let i = 0; i < this.myChildren.length; i++) {
             this.myChildren[i].drawLeaves(coords);
         }
@@ -450,11 +399,11 @@ function randomSign() {
 function defineLeafOutline() {
     xOutline = new Array(nLeafPoints);
     yOutline = new Array(nLeafPoints);
-    
+
     for (let i = 0; i <= nLeafPoints / 2; i++) {
         xOutline[i] = 2 * i / nLeafPoints;
         yOutline[i] = (-pow((xOutline[i] - 0.5), 2) + 0.25);
-        
+
         if (i > 0 && i <= nLeafPoints / 2) {
             xOutline[nLeafPoints - i] = xOutline[i];
             yOutline[nLeafPoints - i] = -yOutline[i];
@@ -480,27 +429,27 @@ class Leaf {
         this.myLength = random(minLength, maxLength);
         this.index = indexO;
     }
-    
+
     moveFromWind() {
         let dThetaWind = ((this.thetaO + this.dTheta) - windDirection) % TWO_PI;
-        
+
         if (dThetaWind > PI) {
             dThetaWind = -(TWO_PI - dThetaWind);
         } else if (dThetaWind < -PI) {
             dThetaWind = TWO_PI + dThetaWind;
         }
-        
+
         this.thetaO = (this.thetaO + TWO_PI) % TWO_PI;
         let forceOfLeaf = -(this.dTheta) / PI;
         let forceOfWind = -windVelocity * sin(dThetaWind);
         let LeafForce = (noise(random(20, 30)) * 30);
         this.dTheta += (forceOfLeaf + forceOfWind) / LeafForce;
     }
-    
+
     rotate(deltaTheta) {
         this.dTheta += deltaTheta;
     }
-    
+
     draw(coord) {
         let x = coord[0];
         let y = coord[1];
@@ -513,11 +462,17 @@ function updateWind() {
     velOff += velIncrement;
     windspeed += windspeedIncrement;
     windDirection = (windDirection - 0.001 + TWO_PI) % TWO_PI;
-    
+
     if (windspeed >= limit) {
         windspeed -= windspeedIncrement;
     }
     windVelocity = (windspeed) * noise(velOff) - 1;
+}
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+    canvasWidth = width;
+    canvasHeight = height;
 }
     </script>
 </body>
