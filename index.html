@@ -28,13 +28,23 @@
         .nav-item {
             text-decoration: none;
             color: #607466;
-            font-size: 12px;
+            font-size: 16px;
             transition: color 0.2s;
             cursor: pointer;
         }
 
         .nav-item.active {
             color: #343E3D;
+        }
+
+        /* Signature */
+        #signature {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            color: #343E3D;
+            font-size: 14px;
+            z-index: 100;
         }
     </style>
 </head>
@@ -44,6 +54,9 @@
         <a href="index.html" class="nav-item active" data-key="1">1</a>
         <a href="canvas.html" class="nav-item" data-key="2">2</a>
     </nav>
+
+    <!-- Signature -->
+    <div id="signature">amanda sun</div>
 
     <script>
         // Keyboard navigation
@@ -126,7 +139,7 @@ let yOutline = [];
 let tempx, tempy;
 
 function setup() {
-    let canvas = createCanvas(windowWidth, 600);
+    let canvas = createCanvas(windowWidth, windowHeight);
     canvasWidth = width;
     canvasHeight = height;
     
@@ -147,6 +160,7 @@ function setup() {
 }
 
 function draw() {
+    
     if (!pauseWind) {
         updateWind();
         
@@ -156,13 +170,18 @@ function draw() {
         
         redrawTrees();
         
+        // Always draw the control panel
+        drawControlPanel();
+
         if (drawWind) {
             drawWindLine();
         }
     }
-    
-    // Always draw the control panel
+    else {
+        // Always draw the control panel
     drawControlPanel();
+    }
+    
 }
 
 function redrawTrees() {
@@ -178,7 +197,7 @@ function drawBranches() {
     for (let i = 0; i < treeNumber; i++) {
         branches[i].drawBranch([
             (1 + i) + (canvasWidth / 2), 
-            canvasHeight - 50 // Moved up from bottom
+            canvasHeight // Tree base at bottom of window
         ]);
     }
 }
@@ -196,16 +215,16 @@ function drawLeavesFunc() {
 
 function drawWindLine() {
     stroke('#6e956c');
-    strokeWeight(2);
-    let dx = 100;
-    let dy = 100;
+    strokeWeight(.5);
+    let dx = 200;
+    let dy = 85;
     let lineLength = 150;
     line(dx, dy, dx + lineLength * windVelocity * cos(windDirection), dy + lineLength * windVelocity * sin(windDirection));
     
     // Draw origin point
     noStroke();
     fill('#6e956c');
-    ellipse(dx, dy, 12, 12);
+    ellipse(dx, dy, 8, 8);
 }
 
 function drawControlPanel() {
@@ -216,29 +235,30 @@ function drawControlPanel() {
     
     // Title
     fill(0);
-    textSize(18);
+    textSize(20);
     textAlign(LEFT, TOP);
     
     // Instructions
     textSize(10);
-    let y = 50;
+    let y = 78;
     let lineHeight = 22;
-    
+    fill(100);
+
     text('↑↓  wind speed', 20, y);
     y += lineHeight;
     text('←→  wind direction', 20, y);
     y += lineHeight;
-    text('space  regenerate tree', 20, y);
-    y += lineHeight;
-    text('click  regenerate tree', 20, y);
+    text('space regenerate tree', 20, y);
     y += lineHeight;
     text('p  pause play', 20, y);
     y += lineHeight;
-    text('m  wind indicator', 20, y);
-    y += lineHeight;
+    
+    
     text('l  leaves', 20, y);
     y += lineHeight;
     text('+-  leaf transparency', 20, y);
+    y += lineHeight;
+    text('m  wind indicator', 20, y);
     
     // Status
     y += lineHeight + 5;
@@ -258,8 +278,8 @@ function initializeTreeValues() {
     drawLeaves = true;
     
     nSegments = 20;
-    totalBranchLength = 300; // Reduced from 500
-    maxBranchThickness = 7; // Reduced from 9
+    totalBranchLength = 350; 
+    maxBranchThickness = 8;
     maxBranchSizeForLeaves = 5;
     minBranchThickness = 2;
     minSpawnDistance = 0.1;
@@ -278,11 +298,11 @@ function initializeTreeValues() {
     transparency = 240;
 }
 
-function mouseClicked() {
-    generateBranches();
-    windDirection = random(TWO_PI);
-    redrawTrees();
-}
+// function mouseClicked() {
+//     generateBranches();
+//     windDirection = random(TWO_PI);
+//     redrawTrees();
+// }
 
 function keyPressed() {
     // Spacebar to regenerate tree
@@ -574,6 +594,13 @@ function updateWind() {
         windspeed -= windspeedIncrement;
     }
     windVelocity = (windspeed) * noise(velOff) - 1;
+}
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+    canvasWidth = width;
+    canvasHeight = height;
+    redrawTrees();
 }
     </script>
 </body>
