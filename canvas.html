@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Canvas</title>
+    
     <style>
+        
         * {
             margin: 0;
             padding: 0;
@@ -114,39 +116,40 @@
         }
 
         /* Arrow navigation buttons */
-        .zoom-arrow {
-            position: fixed;
-            top: 50%;
-            transform: translateY(-50%);
-            background: transparent;
-            border: none;
-            color: #607466;
-            font-size: 48px;
-            width: 60px;
-            height: 60px;
-            cursor: pointer;
-            z-index: 201;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            transition: color 0.2s;
-        }
+       /* Arrow navigation buttons */
+.zoom-arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #607466;
+    font-size: 24px;  /* Changed from 48px to 24px */
+    width: 40px;      /* Changed from 60px to 40px */
+    height: 40px;     /* Changed from 60px to 40px */
+    cursor: pointer;
+    z-index: 201;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
 
-        .zoom-arrow:hover {
-            color: #343E3D;
-        }
+.zoom-arrow:hover {
+    color: #343E3D;
+}
 
-        .zoom-arrow.visible {
-            display: flex;
-        }
+.zoom-arrow.visible {
+    display: flex;
+}
 
-        #prev-arrow {
-            left: 20px;
-        }
+#prev-arrow {
+    left: 20px;
+}
 
-        #next-arrow {
-            right: 20px;
-        }
+#next-arrow {
+    right: 20px;
+}
 
         #escape-hint {
             position: fixed;
@@ -161,6 +164,83 @@
         #escape-hint.visible {
             display: block;
         }
+
+/* Desktop: hide mobile captions */
+.mobile-caption {
+    display: none;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+    body {
+        cursor: default;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    body.grabbing {
+        cursor: default;
+    }
+
+    #canvas-container {
+        width: 100vw;
+        height: auto;
+        position: relative;
+        overflow: visible;
+    }
+
+    #canvas {
+        width: 100vw;
+        height: auto;
+        position: relative;
+        transform: none !important;
+        transition: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 80px 20px 40px;
+        gap: 40px;
+    }
+
+    .image-item {
+        position: relative !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 90vw !important;
+        height: auto !important;
+        max-width: 500px;
+        cursor: default;
+    }
+
+    .image-item img {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+    }
+
+    .mobile-caption {
+        display: block !important;  /* Added !important to override */
+        margin-top: 10px;
+        color: #607466;
+        font-size: 12px;
+        text-align: center;
+        padding: 0 10px;
+    }
+
+    /* Hide arrows on mobile */
+    .zoom-arrow {
+        display: none !important;
+    }
+
+    /* Hide zoom overlay on mobile */
+    #zoom-overlay {
+        display: none !important;
+    }
+
+    #escape-hint {
+        display: none !important;
+    }
+}
     </style>
 </head>
 <body>
@@ -202,25 +282,25 @@
             { src: 'imgs/animation/Puppy-GIF.gif', width: 400, height: 500, caption: 'self taught, procreate + adobe aftereffects' },
             { src: 'imgs/animation/cervest_animation_folder.gif', width: 400, height: 400, caption: 'motion design internship, adobe aftereffects' },
             { src: 'imgs/id/box.jpg', width: 400, height: 400, caption: '6 identical puzzle pieces that slide into a cube, cnc router + prototyping' },
-            { src: 'imgs/illustration/I_miss_empty_nesting.png', width: 450, height: 350, caption: 'the dartmouth cartoonist' },
-            { src: 'imgs/illustration/I-m_Sick_Of_This_Clean_Air.png', width: 380, height: 420, caption: 'the dartmouth cartoonist' },
-            { src: 'imgs/illustration/IMG_0024.jpg', width: 420, height: 600, caption: 'the dartmouth cartoonist' },
+            { src: 'imgs/illustration/I_miss_empty_nesting.png', width: 450, height: 350 },
+            { src: 'imgs/illustration/I-m_Sick_Of_This_Clean_Air.png', width: 380, height: 420 },
+            { src: 'imgs/illustration/IMG_0024.jpg', width: 420, height: 600, caption: 'acrylic on skateboard' },
             { src: 'imgs/illustration/kegshirts5.png', width: 420, height: 320, caption: 'solo business for sold-out tees, procreate' },
-            { src: 'imgs/illustration/Tanning_In_2020-1.png', width: 500, height: 600, caption: 'the dartmouth cartoonist' },
-            { src: 'imgs/illustration/Phase_4_Can-t_Come_Quicker.png', width: 500, height: 600, caption: 'the dartmouth cartoonist' },
+            { src: 'imgs/illustration/Phase_4_Can-t_Come_Quicker.png', width: 500, height: 600 },
         ];
         // ========================================
-
+    
         const canvas = document.getElementById('canvas');
         const canvasContainer = document.getElementById('canvas-container');
-
+    
         let scale = 1;
         let isDragging = false;
         let startX, startY;
         let currentX = 0;
         let currentY = 0;
         let currentZoomIndex = -1;
-
+        let isMobile = window.innerWidth <= 768;
+    
         // Generate random positions for images
         function getRandomPosition(index, total) {
             const canvasSize = 4000;
@@ -232,7 +312,7 @@
                 y: canvasSize / 2 + Math.sin(angle) * radius + (Math.random() - 0.5) * 400
             };
         }
-
+    
         // Create image elements
         images.forEach((img, index) => {
             const pos = getRandomPosition(index, images.length);
@@ -249,40 +329,52 @@
             imgTag.draggable = false;
             
             imageEl.appendChild(imgTag);
+            
+            // Add caption for mobile
+            if (img.caption) {
+                const captionEl = document.createElement('div');
+                captionEl.className = 'mobile-caption';
+                captionEl.textContent = img.caption;
+                imageEl.appendChild(captionEl);
+            }
+            
             canvas.appendChild(imageEl);
             
-            // Add click handler for zoom
+            // Add click handler for zoom (only on desktop)
             imageEl.addEventListener('click', (e) => {
-                e.stopPropagation();
-                showZoomedImage(index);
+                if (!isMobile) {
+                    e.stopPropagation();
+                    showZoomedImage(index);
+                }
             });
         });
-
+    
         function updateTransform() {
             canvas.style.transform = `translate(${currentX}px, ${currentY}px) scale(${scale})`;
         }
-
+    
         // Pan functionality
         canvasContainer.addEventListener('mousedown', (e) => {
+            if (isMobile) return;
             if (e.target.closest('.image-item')) return;
             isDragging = true;
             startX = e.clientX - currentX;
             startY = e.clientY - currentY;
             document.body.classList.add('grabbing');
         });
-
+    
         document.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
+            if (!isDragging || isMobile) return;
             currentX = e.clientX - startX;
             currentY = e.clientY - startY;
             updateTransform();
         });
-
+    
         document.addEventListener('mouseup', () => {
             isDragging = false;
             document.body.classList.remove('grabbing');
         });
-
+    
         // Zoom functionality
         const zoomOverlay = document.getElementById('zoom-overlay');
         const zoomImage = document.getElementById('zoom-image');
@@ -290,8 +382,10 @@
         const escapeHint = document.getElementById('escape-hint');
         const prevArrow = document.getElementById('prev-arrow');
         const nextArrow = document.getElementById('next-arrow');
-
+    
         function showZoomedImage(index) {
+            if (isMobile) return; // Disable zoom on mobile
+            
             currentZoomIndex = index;
             const img = images[index];
             zoomImage.src = img.src;
@@ -301,7 +395,7 @@
             prevArrow.classList.add('visible');
             nextArrow.classList.add('visible');
         }
-
+    
         function hideZoomedImage() {
             zoomOverlay.classList.remove('active');
             escapeHint.classList.remove('visible');
@@ -311,41 +405,43 @@
             zoomCaption.textContent = '';
             currentZoomIndex = -1;
         }
-
+    
         function showNextImage() {
             if (currentZoomIndex >= 0) {
                 currentZoomIndex = (currentZoomIndex + 1) % images.length;
                 showZoomedImage(currentZoomIndex);
             }
         }
-
+    
         function showPreviousImage() {
             if (currentZoomIndex >= 0) {
                 currentZoomIndex = (currentZoomIndex - 1 + images.length) % images.length;
                 showZoomedImage(currentZoomIndex);
             }
         }
-
+    
         zoomOverlay.addEventListener('click', (e) => {
             // Only close if clicking on the overlay itself, not the arrows
             if (e.target === zoomOverlay) {
                 hideZoomedImage();
             }
         });
-
+    
         // Arrow button handlers
         prevArrow.addEventListener('click', (e) => {
             e.stopPropagation();
             showPreviousImage();
         });
-
+    
         nextArrow.addEventListener('click', (e) => {
             e.stopPropagation();
             showNextImage();
         });
-
+    
         // Initial render - center and scale to show all images
         function centerToShowAllImages() {
+            if (isMobile) return; // Skip centering on mobile
+            
             // Calculate bounds of all images
             let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
             
@@ -387,13 +483,16 @@
         centerToShowAllImages();
         
         // Recenter on window resize
-        window.addEventListener('resize', centerToShowAllImages);
-
+        window.addEventListener('resize', () => {
+            isMobile = window.innerWidth <= 768;
+            centerToShowAllImages();
+        });
+    
         // Prevent image dragging
         document.querySelectorAll('img').forEach(img => {
             img.addEventListener('dragstart', (e) => e.preventDefault());
         });
-
+    
         // Keyboard navigation
         document.addEventListener('keydown', (e) => {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -403,7 +502,7 @@
                 hideZoomedImage();
                 return;
             }
-
+    
             // Arrow keys in zoom mode
             if (currentZoomIndex >= 0) {
                 if (e.key === 'ArrowLeft') {
