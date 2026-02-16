@@ -53,6 +53,8 @@
     <nav id="nav-pane">
         <a href="index.html" class="nav-item active" data-key="1">1</a>
         <a href="canvas.html" class="nav-item" data-key="2">2</a>
+        <a href="links.html" class="nav-item active" data-key="3">3</a>
+
     </nav>
 
     <!-- Signature -->
@@ -231,12 +233,12 @@ function drawControlPanel() {
     // Semi-transparent background
     fill(255, 255, 255, 230);
     noStroke();
-    rect(10, 10, 300, 280, 5);
+    // rect(10, 10, 300, 280, 5);
     
     // Title
     fill(0);
     textSize(20);
-    textAlign(LEFT, TOP);
+    textAlign(RIGHT, TOP);  // Changed to RIGHT
     
     // Instructions
     textSize(10);
@@ -244,32 +246,35 @@ function drawControlPanel() {
     let lineHeight = 22;
     fill(100);
 
-    text('↑↓  wind speed', 20, y);
+    // Change x position to width - margin (e.g., width - 20)
+    let rightX = width - 20;
+ 
+    text('↑↓  wind speed', rightX, y);
     y += lineHeight;
-    text('←→  wind direction', 20, y);
+    text('←→  wind direction', rightX, y);
     y += lineHeight;
-    text('space regenerate tree', 20, y);
+    text('space regenerate tree', rightX, y);
     y += lineHeight;
-    text('p  pause play', 20, y);
+    text('p  pause play', rightX, y);
     y += lineHeight;
     
     
-    text('l  leaves', 20, y);
+    text('l  leaves', rightX, y);
     y += lineHeight;
-    text('+-  leaf transparency', 20, y);
+    text('+-  leaf transparency', rightX, y);
     y += lineHeight;
-    text('m  wind indicator', 20, y);
+    text('m  wind indicator', rightX, y);
     
     // Status
     y += lineHeight + 5;
     fill(100);
     //y += lineHeight;
     
-    text('speed: ' + windVelocity.toFixed(1), 20, y);
+    text('speed: ' + windVelocity.toFixed(1), rightX, y);
     //y += lineHeight;
-    //text('wind: ' + (pauseWind ? 'Paused' : 'Active'), 20, y);
+    //text('wind: ' + (pauseWind ? 'Paused' : 'Active'), rightX, y);
     //y += lineHeight;
-    //text('Leaves: ' + (drawLeaves ? 'Visible' : 'Hidden'), 20, y);
+    //text('Leaves: ' + (drawLeaves ? 'Visible' : 'Hidden'), rightX, y);
 }
 
 function initializeTreeValues() {

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Press & Links</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: white;
+            font-family: nyt-imperial, georgia, 'times new roman', times, serif;
+            padding: 60px 40px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Navigation */
+        #nav-pane {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 16px;
+            z-index: 100;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: #607466;
+            font-size: 16px;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: #343E3D;
+        }
+
+        /* Signature */
+        #signature {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            color: #343E3D;
+            font-size: 14px;
+            z-index: 100;
+        }
+
+        /* Content sections */
+        .section {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            color: #343E3D;
+            margin-bottom: 20px;
+            font-weight: normal;
+        }
+
+        .link-item {
+            margin-bottom: 25px;
+        }
+
+        .project-name {
+            font-size: 14px;
+            color: #343E3D;
+            margin-bottom: 8px;
+            font-weight: normal;
+        }
+
+        .source {
+            font-size: 14px;
+            color: #607466;
+            margin-bottom: 5px;
+        }
+
+        a {
+            color: #607466;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        a:hover {
+            color: #343E3D;
+        }
+
+        .external-link {
+            font-size: 14px;
+            display: block;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Pane -->
+    <nav id="nav-pane">
+        <a href="index.html" class="nav-item" data-key="1">1</a>
+        <a href="canvas.html" class="nav-item" data-key="2">2</a>
+        <a href="links.html" class="nav-item active" data-key="3">3</a>
+    </nav>
+
+    <!-- Signature -->
+    <div id="signature">amanda sun</div>
+
+    <div class="container">
+        <!-- LinkedIn Section -->
+        <div class="section">
+            <div class="section-title">contact</div>
+            <a href="https://www.linkedin.com/in/amandajsun" target="_blank" class="external-link">
+                linkedin.com/in/amandajsun
+            </a>
+        </div>
+
+        <!-- Press Section -->
+        <div class="section">
+            <div class="section-title">press</div>
+
+            <div class="link-item">
+                <div class="project-name">green2go</div>
+                <a href="https://web.archive.org/web/20221109172056/https://www.goodmorningamerica.com/gma3/video/climate-hero-dartmouth-student-expands-campus-reusable-container-92907941" target="_blank" class="external-link">
+                    good morning america
+                </a>
+                <a href="http://web.archive.org/web/20220427193629/https://foodprint.org/blog/fighting-plastic/" target="_blank" class="external-link">
+                    foodprint
+                </a>
+                <a href="https://web.archive.org/web/20230503190202/https://api.thecrimson.com/article/2022/2/3/student-dining-hall-waste/" target="_blank" class="external-link">
+                    harvard crimson
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            
+            // Number keys for navigation
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                if (item.dataset.key === e.key) {
+                    window.location.href = item.href;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -90,6 +90,7 @@
             background: white;
             z-index: 200;
             display: none;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: default;
@@ -103,6 +104,48 @@
             max-width: 80%;
             max-height: 80%;
             object-fit: contain;
+        }
+
+        #zoom-caption {
+            margin-top: 20px;
+            color: #607466;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        /* Arrow navigation buttons */
+        .zoom-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: #607466;
+            font-size: 48px;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            z-index: 201;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .zoom-arrow:hover {
+            color: #343E3D;
+        }
+
+        .zoom-arrow.visible {
+            display: flex;
+        }
+
+        #prev-arrow {
+            left: 20px;
+        }
+
+        #next-arrow {
+            right: 20px;
         }
 
         #escape-hint {
@@ -130,7 +173,12 @@
     <!-- Zoom overlay -->
     <div id="zoom-overlay">
         <img id="zoom-image" src="" alt="">
+        <div id="zoom-caption"></div>
     </div>
+
+    <!-- Arrow navigation -->
+    <button id="prev-arrow" class="zoom-arrow">←</button>
+    <button id="next-arrow" class="zoom-arrow">→</button>
 
     <!-- Escape hint -->
     <div id="escape-hint">hit esc</div>
@@ -139,6 +187,7 @@
     <nav id="nav-pane">
         <a href="index.html" class="nav-item" data-key="1">1</a>
         <a href="canvas.html" class="nav-item active" data-key="2">2</a>
+        <a href="links.html" class="nav-item active" data-key="3">3</a>
     </nav>
 
     <script>
@@ -147,20 +196,19 @@
         // ========================================
         const images = [
             // Add your images like this:
-            // { src: 'path/to/your/image1.jpg', width: 400, height: 300 },
-            // { src: 'path/to/your/image2.png', width: 500, height: 400 },
+            // { src: 'path/to/your/image1.jpg', width: 400, height: 300, caption: 'Your caption' },
             
             
             // Placeholder images (replace these with your own):
-            { src: 'imgs/animation/Puppy-GIF.gif', width: 400, height: 500 },
-            { src: 'imgs/animation/cervest_animation_folder.gif', width: 400, height: 400 },
-            { src: 'imgs/id/box.jpg', width: 400, height: 400 },
-            { src: 'imgs/illustration/I_miss_empty_nesting.png', width: 450, height: 350 },
-            { src: 'imgs/illustration/I-m_Sick_Of_This_Clean_Air.png', width: 380, height: 420 },
-            { src: 'imgs/illustration/IMG_0024.jpg', width: 420, height: 600 },
-            { src: 'imgs/illustration/kegshirts5.png', width: 420, height: 320 },
-            { src: 'imgs/illustration/Tanning_In_2020-1.png', width: 500, height: 600 },
-            { src: 'imgs/illustration/Phase_4_Can-t_Come_Quicker.png', width: 500, height: 600 },
+            { src: 'imgs/animation/Puppy-GIF.gif', width: 400, height: 500, caption: 'self taught tutorial' },
+            { src: 'imgs/animation/cervest_animation_folder.gif', width: 400, height: 400, caption: 'motion design internship' },
+            { src: 'imgs/id/box.jpg', width: 400, height: 400, caption: 'architecture class' },
+            { src: 'imgs/illustration/I_miss_empty_nesting.png', width: 450, height: 350, caption: 'the dartmouth cartoonist' },
+            { src: 'imgs/illustration/I-m_Sick_Of_This_Clean_Air.png', width: 380, height: 420, caption: 'the dartmouth cartoonist' },
+            { src: 'imgs/illustration/IMG_0024.jpg', width: 420, height: 600, caption: 'the dartmouth cartoonist' },
+            { src: 'imgs/illustration/kegshirts5.png', width: 420, height: 320, caption: 'solo business, sold out tees' },
+            { src: 'imgs/illustration/Tanning_In_2020-1.png', width: 500, height: 600, caption: 'the dartmouth cartoonist' },
+            { src: 'imgs/illustration/Phase_4_Can-t_Come_Quicker.png', width: 500, height: 600, caption: 'the dartmouth cartoonist' },
         ];
         // ========================================
 
@@ -172,6 +220,7 @@
         let startX, startY;
         let currentX = 0;
         let currentY = 0;
+        let currentZoomIndex = -1;
 
         // Generate random positions for images
         function getRandomPosition(index, total) {
@@ -206,7 +255,7 @@
             // Add click handler for zoom
             imageEl.addEventListener('click', (e) => {
                 e.stopPropagation();
-                showZoomedImage(img.src);
+                showZoomedImage(index);
             });
         });
 
@@ -238,21 +287,63 @@
         // Zoom functionality
         const zoomOverlay = document.getElementById('zoom-overlay');
         const zoomImage = document.getElementById('zoom-image');
+        const zoomCaption = document.getElementById('zoom-caption');
         const escapeHint = document.getElementById('escape-hint');
+        const prevArrow = document.getElementById('prev-arrow');
+        const nextArrow = document.getElementById('next-arrow');
 
-        function showZoomedImage(src) {
-            zoomImage.src = src;
+        function showZoomedImage(index) {
+            currentZoomIndex = index;
+            const img = images[index];
+            zoomImage.src = img.src;
+            zoomCaption.textContent = img.caption || '';
             zoomOverlay.classList.add('active');
             escapeHint.classList.add('visible');
+            prevArrow.classList.add('visible');
+            nextArrow.classList.add('visible');
         }
 
         function hideZoomedImage() {
             zoomOverlay.classList.remove('active');
             escapeHint.classList.remove('visible');
+            prevArrow.classList.remove('visible');
+            nextArrow.classList.remove('visible');
             zoomImage.src = '';
+            zoomCaption.textContent = '';
+            currentZoomIndex = -1;
         }
 
-        zoomOverlay.addEventListener('click', hideZoomedImage);
+        function showNextImage() {
+            if (currentZoomIndex >= 0) {
+                currentZoomIndex = (currentZoomIndex + 1) % images.length;
+                showZoomedImage(currentZoomIndex);
+            }
+        }
+
+        function showPreviousImage() {
+            if (currentZoomIndex >= 0) {
+                currentZoomIndex = (currentZoomIndex - 1 + images.length) % images.length;
+                showZoomedImage(currentZoomIndex);
+            }
+        }
+
+        zoomOverlay.addEventListener('click', (e) => {
+            // Only close if clicking on the overlay itself, not the arrows
+            if (e.target === zoomOverlay) {
+                hideZoomedImage();
+            }
+        });
+
+        // Arrow button handlers
+        prevArrow.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showPreviousImage();
+        });
+
+        nextArrow.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showNextImage();
+        });
 
         // Initial render - center and scale to show all images
         function centerToShowAllImages() {
@@ -312,6 +403,18 @@
             if (e.key === 'Escape') {
                 hideZoomedImage();
                 return;
+            }
+
+            // Arrow keys in zoom mode
+            if (currentZoomIndex >= 0) {
+                if (e.key === 'ArrowLeft') {
+                    showPreviousImage();
+                    return;
+                }
+                if (e.key === 'ArrowRight') {
+                    showNextImage();
+                    return;
+                }
             }
             
             // Number keys for navigation
