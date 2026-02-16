@@ -14,7 +14,40 @@
             font-family: nyt-imperial, georgia, 'times new roman', times, serif;
             min-height: 100vh;
         }
+/* Mobile styles */
+@media (max-width: 768px) {
+    /* ... existing mobile styles ... */
 
+    /* Make navigation more touch-friendly on mobile */
+    #nav-pane {
+        top: 20px;
+        left: 20px;
+        z-index: 1000;
+    }
+
+    .nav-item {
+        font-size: 18px;
+    }
+
+    #signature {
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+    #canvas {
+        width: 100vw;
+        height: auto;
+        position: relative;
+        transform: none !important;
+        transition: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 80px 20px 40px;
+        gap: 40px;
+        z-index: 1; /* Keep canvas below fixed elements */
+    }
+}
         /* More info link */
 #more-info {
     position: fixed;
@@ -63,6 +96,7 @@
             z-index: 100;
         }
     </style>
+    
 </head>
 <body>
 <!-- Navigation Pane -->
@@ -101,6 +135,7 @@
             padding: 0;
             overflow: hidden;
         }
+
     </style>
 </head>
 <body>
@@ -299,8 +334,8 @@ function initializeTreeValues() {
     drawLeaves = true;
     
     nSegments = Math.max(Math.round(windowHeight * 0.03), 7);
-    totalBranchLength = windowWidth * 0.45;
-    maxBranchThickness = windowWidth * 0.006;
+    totalBranchLength = windowWidth * 0.4;
+    maxBranchThickness = windowWidth * 0.005;
     maxBranchSizeForLeaves = 5;
     minBranchThickness = 2;
     minSpawnDistance = 0.1;
