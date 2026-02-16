@@ -264,28 +264,29 @@ function drawControlPanel() {
     // Change x position to width - margin (e.g., width - 20)
     let rightX = width - 20;
  
-    text('↑↓  wind speed', rightX, y);
-    y += lineHeight;
-    text('←→  wind direction', rightX, y);
-    y += lineHeight;
-    text('space regenerate tree', rightX, y);
-    y += lineHeight;
-    text('p  pause play', rightX, y);
+    // text('↑↓  wind speed', rightX, y);
+    // y += lineHeight;
+    // text('←→  wind direction', rightX, y);\
+    text('speed: ' + windVelocity.toFixed(1), rightX, y);
+    // y += lineHeight;
+    text('\npress: spacebar\n P\n L', rightX, y);
+    // y += lineHeight;
+    // text('p  pause play', rightX, y);
     y += lineHeight;
     
     
-    text('l  leaves', rightX, y);
-    y += lineHeight;
-    text('+-  leaf transparency', rightX, y);
-    y += lineHeight;
-    text('m  wind indicator', rightX, y);
+    // text('l  leaves', rightX, y);
+    // y += lineHeight;
+    // text('+-  leaf transparency', rightX, y);
+    // y += lineHeight;
+    // text('m  wind indicator', rightX, y);
     
     // Status
     y += lineHeight + 5;
     fill(100);
     //y += lineHeight;
     
-    text('speed: ' + windVelocity.toFixed(1), rightX, y);
+    // text('speed: ' + windVelocity.toFixed( 1), rightX, y);
     //y += lineHeight;
     //text('wind: ' + (pauseWind ? 'Paused' : 'Active'), rightX, y);
     //y += lineHeight;
@@ -297,9 +298,9 @@ function initializeTreeValues() {
     drawWind = false;
     drawLeaves = true;
     
-    nSegments = 20;
-    totalBranchLength = 350; 
-    maxBranchThickness = 8;
+    nSegments = Math.max(Math.round(windowHeight * 0.03), 7);
+    totalBranchLength = windowWidth * 0.45;
+    maxBranchThickness = windowWidth * 0.006;
     maxBranchSizeForLeaves = 5;
     minBranchThickness = 2;
     minSpawnDistance = 0.1;
@@ -318,11 +319,25 @@ function initializeTreeValues() {
     transparency = 240;
 }
 
-// function mouseClicked() {
-//     generateBranches();
-//     windDirection = random(TWO_PI);
-//     redrawTrees();
-// }
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+    canvasWidth = width;
+    canvasHeight = height;
+    initializeTreeValues(); // Recalculate tree proportions
+    generateBranches(); // Regenerate tree with new size
+    redrawTrees();
+}
+// Mobile touch support
+function touchStarted() {
+    // Prevent default touch behavior
+    if (touches.length > 0) {
+        generateBranches();
+        windDirection = random(TWO_PI);
+        redrawTrees();
+        return false; // Prevent default
+    }
+}
+
 function keyPressed() {
     // Spacebar to regenerate tree
     if (key === ' ') {
