@@ -192,6 +192,7 @@ let tempx, tempy;
 
 function setup() {
     let canvas = createCanvas(windowWidth, windowHeight);
+    canvas.parent(document.body); // Explicitly set parent
     canvasWidth = width;
     canvasHeight = height;
     
@@ -210,7 +211,6 @@ function setup() {
     generateBranches();
     redrawTrees();
 }
-
 function draw() {
     
     if (!pauseWind) {
@@ -280,10 +280,16 @@ function drawWindLine() {
 }
 
 function drawControlPanel() {
-    // Semi-transparent background
-    fill(255, 255, 255, 230);
-    noStroke();
-    // rect(10, 10, 300, 280, 5);
+    textAlign(RIGHT, TOP); 
+    textSize(10);
+    let y = 78;
+    let lineHeight = 22;
+    fill(100);
+    let rightX = width - 20;
+    text('tap or space to grow a new tree', rightX, y);
+    text('\nspeed: ' + windVelocity.toFixed(1), rightX, y);
+}
+function drawControlPanel2() {
     
     // Title
     fill(0);
@@ -362,10 +368,19 @@ function windowResized() {
     generateBranches(); // Regenerate tree with new size
     redrawTrees();
 }
+
 // Mobile touch support
 function touchStarted() {
-    // Prevent default touch behavior
+    // Don't regenerate tree if touching UI elements (top 60px or bottom 60px of screen)
     if (touches.length > 0) {
+        const touchY = touches[0].y;
+        
+        // Skip if touching navigation area (top) or more info link (bottom)
+        if (touchY < 60 || touchY > windowHeight - 60) {
+            return true; // Allow default behavior (navigation)
+        }
+        
+        // Otherwise, generate new tree
         generateBranches();
         windDirection = random(TWO_PI);
         redrawTrees();
