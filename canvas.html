@@ -273,21 +273,24 @@
         // ========================================
         // CONFIGURE YOUR IMAGES HERE
         // ========================================
-        const images = [
-            // Add your images like this:
-            // { src: 'path/to/your/image1.jpg', width: 400, height: 300, caption: 'Your caption' },
-            
-            
-            // Placeholder images (replace these with your own):
-            { src: 'imgs/animation/Puppy-GIF.gif', width: 400, height: 500, caption: 'self taught, procreate + adobe aftereffects' },
-            { src: 'imgs/animation/cervest_animation_folder.gif', width: 400, height: 400, caption: 'motion design internship, adobe aftereffects' },
-            { src: 'imgs/id/box.jpg', width: 400, height: 400, caption: '6 identical puzzle pieces that slide into a cube, cnc router + prototyping' },
-            { src: 'imgs/illustration/I_miss_empty_nesting.png', width: 450, height: 350 },
-            { src: 'imgs/illustration/I-m_Sick_Of_This_Clean_Air.png', width: 380, height: 420 },
-            { src: 'imgs/illustration/IMG_0024.jpg', width: 420, height: 600, caption: 'acrylic on skateboard' },
-            { src: 'imgs/illustration/kegshirts5.png', width: 420, height: 320, caption: 'solo business for sold-out tees, procreate' },
-            { src: 'imgs/illustration/Phase_4_Can-t_Come_Quicker.png', width: 500, height: 600 },
-        ];
+        // Calculate scale based on viewport
+const imageScale = Math.min(window.innerWidth / 1000, 1); // Scale based on 1920px baseline, max 1x
+
+const images = [
+    // Add your images like this:
+    // { src: 'path/to/your/image1.jpg', width: 400, height: 300, caption: 'Your caption' },
+    
+    
+    // Placeholder images (replace these with your own):
+    { src: 'imgs/animation/Puppy-GIF.gif', width: 400 * imageScale, height: 500 * imageScale, caption: 'self taught, procreate + adobe aftereffects' },
+    { src: 'imgs/animation/cervest_animation_folder.gif', width: 400 * imageScale, height: 400 * imageScale, caption: 'motion design internship, adobe aftereffects' },
+    { src: 'imgs/id/box.jpg', width: 400 * imageScale, height: 400 * imageScale, caption: '6 identical puzzle pieces that slide into a cube, cnc router + prototyping' },
+    { src: 'imgs/illustration/I_miss_empty_nesting.png', width: 450 * imageScale, height: 350 * imageScale },
+    { src: 'imgs/illustration/I-m_Sick_Of_This_Clean_Air.png', width: 380 * imageScale, height: 420 * imageScale },
+    { src: 'imgs/illustration/IMG_0024.jpg', width: 420 * imageScale, height: 600 * imageScale, caption: 'acrylic on skateboard' },
+    { src: 'imgs/illustration/kegshirts5.png', width: 420 * imageScale, height: 320 * imageScale, caption: 'solo business for sold-out tees, procreate' },
+    { src: 'imgs/illustration/Phase_4_Can-t_Come_Quicker.png', width: 500 * imageScale, height: 600 * imageScale },
+];
         // ========================================
     
         const canvas = document.getElementById('canvas');
