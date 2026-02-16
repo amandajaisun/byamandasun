@@ -49,13 +49,12 @@
     </style>
 </head>
 <body>
-    <!-- Navigation Pane -->
-    <nav id="nav-pane">
-        <a href="index.html" class="nav-item active" data-key="1">1</a>
-        <a href="canvas.html" class="nav-item" data-key="2">2</a>
-        <a href="links.html" class="nav-item active" data-key="3">3</a>
-
-    </nav>
+<!-- Navigation Pane -->
+<nav id="nav-pane">
+    <a href="index.html" class="nav-item active" data-key="1">1</a>
+    <a href="canvas.html" class="nav-item" data-key="2">2</a>
+    <a href="links.html" class="nav-item" data-key="3">3</a>
+</nav>
 
     <!-- Signature -->
     <div id="signature">amanda sun</div>
@@ -308,7 +307,6 @@ function initializeTreeValues() {
 //     windDirection = random(TWO_PI);
 //     redrawTrees();
 // }
-
 function keyPressed() {
     // Spacebar to regenerate tree
     if (key === ' ') {
@@ -332,12 +330,23 @@ function keyPressed() {
     
     // Arrow keys for wind direction
     if (keyCode === LEFT_ARROW) {
-        windDirection -= 0.1; // Rotate counter-clockwise
+        windDirection -= 0.1;
         windDirection = (windDirection + TWO_PI) % TWO_PI;
     }
     if (keyCode === RIGHT_ARROW) {
-        windDirection += 0.1; // Rotate clockwise
+        windDirection += 0.1;
         windDirection = (windDirection + TWO_PI) % TWO_PI;
+    }
+    
+    // Number keys for page navigation
+    if (key === '1') {
+        window.location.href = 'index.html';
+    }
+    if (key === '2') {
+        window.location.href = 'canvas.html';
+    }
+    if (key === '3') {
+        window.location.href = 'links.html';
     }
     
     redrawTrees();
@@ -348,7 +357,7 @@ function keyTyped() {
         drawWind = !drawWind;
         console.log(drawWind);
     }
-    if (key === '1') {
+    if (key === 'l') {  // Changed from '1' to 'l' for leaves
         drawLeaves = !drawLeaves;
     }
     if (key === 'p') {
