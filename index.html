@@ -1,7 +1,13 @@
 <!DOCTYPE html>
-<meta charset="UTF-8">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -11,58 +17,10 @@
 
         body {
             background: white;
-            font-family: nyt-imperial, georgia, 'times new roman', times, serif;
+            font-family: 'DM Sans', sans-serif;
             min-height: 100vh;
+            overflow: hidden;
         }
-/* Mobile styles */
-@media (max-width: 768px) {
-    /* ... existing mobile styles ... */
-
-    /* Make navigation more touch-friendly on mobile */
-    #nav-pane {
-        top: 20px;
-        left: 20px;
-        z-index: 1000;
-    }
-
-    .nav-item {
-        font-size: 18px;
-    }
-
-    #signature {
-        top: 20px;
-        right: 20px;
-        z-index: 1000;
-    }
-    #canvas {
-        width: 100vw;
-        height: auto;
-        position: relative;
-        transform: none !important;
-        transition: none;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 80px 20px 40px;
-        gap: 40px;
-        z-index: 1; /* Keep canvas below fixed elements */
-    }
-}
-        /* More info link */
-#more-info {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    color: #607466;
-    font-size: 12px;
-    z-index: 100;
-    text-decoration: none;
-    transition: color 0.2s;
-}
-
-#more-info:hover {
-    color: #343E3D;
-}
 
         /* Navigation */
         #nav-pane {
@@ -72,48 +30,84 @@
             display: flex;
             gap: 16px;
             z-index: 100;
+            line-height: 1;
         }
-
         .nav-item {
-            text-decoration: none;
-            color: #607466;
-            font-size: 16px;
-            transition: color 0.2s;
-            cursor: pointer;
-        }
+    text-decoration: none;
+    color: #607466;
+    font-size: clamp(14px, 2.5vw, 32px);
+    transition: color 0.2s;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+}
+
+#signature {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    color: #343E3D;
+    font-size: clamp(14px, 2.5vw, 32px);
+    font-family: 'DM Sans', sans-serif;
+    z-index: 100;
+    line-height: 1;
+}
 
         .nav-item.active {
             color: #343E3D;
         }
 
-        /* Signature */
-        #signature {
+        /* More info link */
+        #more-info {
             position: fixed;
-            top: 20px;
+            bottom: 20px;
             right: 20px;
-            color: #343E3D;
-            font-size: 14px;
+            color: #607466;
+            font-size: clamp(10px, 1vw, 14px);
+            font-family: 'DM Sans', sans-serif;
             z-index: 100;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        #more-info:hover {
+            color: #343E3D;
+        }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            .nav-item {
+                font-size: 14px;
+            }
+
+            #signature {
+                font-size: 14px;
+            }
+
+            #more-info {
+                font-size: 12px;
+            }
         }
     </style>
-    
 </head>
 <body>
-<!-- Navigation Pane -->
-<nav id="nav-pane">
-    <a href="index.html" class="nav-item active" data-key="1">1</a>
-    <a href="canvas.html" class="nav-item" data-key="2">2</a>
-    <a href="links.html" class="nav-item" data-key="3">3</a>
-</nav>
+
+    <!-- Navigation Pane -->
+    <nav id="nav-pane">
+        <a href="index.html" class="nav-item active" data-key="1">1</a>
+        <a href="canvas.html" class="nav-item" data-key="2">2</a>
+        <a href="links.html" class="nav-item" data-key="3">3</a>
+    </nav>
 
     <!-- Signature -->
     <div id="signature">amanda sun</div>
+
+    <!-- More info link -->
+    <a id="more-info" href="http://byamandasun.com/code/billington" target="_blank">for more info</a>
 
     <script>
         // Keyboard navigation
         document.addEventListener('keydown', (e) => {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-            
             const navItems = document.querySelectorAll('.nav-item');
             navItems.forEach(item => {
                 if (item.dataset.key === e.key) {
@@ -122,585 +116,343 @@
             });
         });
     </script>
-</body>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wind Tree Animation</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
 
-    </style>
-</head>
-<body>
     <script>
-let liveWindSpeed = false;
-let maxWindSpeed = 8.8;
-let canvasWidth = 1320;
-let canvasHeight = 520;
-let transparency = 150;
-let leafColor;
-let branchColor;
-let skyColor;
+        let smoothedWind = 0;
+        let transparency = 150;
+        let leafColor, branchColor, skyColor;
 
-// Branch controls
-let treeNumber = 2;
-let nSegments;
-let totalBranchLength;
-let maxBranchThickness;
-let minBranchThickness;
-let minSpawnDistance;
-let branchSpawnOdds;
-let branchSpawnOddsOfSecond;
-let mindThetaSplit;
-let maxdThetaSplit;
-let maxdThetaWander;
-let dBranchSize;
+        // Branch controls
+        let treeNumber = 2;
+        let nSegments, totalBranchLength, maxBranchThickness;
+        let minBranchThickness, minSpawnDistance;
+        let branchSpawnOdds, branchSpawnOddsOfSecond;
+        let mindThetaSplit, maxdThetaSplit, maxdThetaWander, dBranchSize;
 
-// Leaf controls
-let minLength;
-let maxLength;
-let minWidth;
-let maxWidth;
-let maxBranchSizeForLeaves;
-let leafSpawnOdds;
-let branches = [];
-let pauseWind = false;
-let drawWind = false;
-let drawLeaves = true;
+        // Leaf controls
+        let minLength, maxLength, minWidth, maxWidth;
+        let maxBranchSizeForLeaves, leafSpawnOdds;
+        let branches = [];
+        let pauseWind = false;
+        let drawWind = false;
+        let drawLeaves = true;
 
-// Wind variables
-let windDirection;
-let windVelocity;
-let velIncrement;
-let velOff = 0;
-let windspeedIncrement;
-let windspeed = 0;
-let limit = 2.1;
+        // Wind variables
+        let windDirection, windVelocity;
+        let velIncrement, velOff = 0;
+        let windspeedIncrement, windspeed = 0;
+        let limit = 2.1;
 
-// Leaf outline
-let nLeafPoints = 12;
-let xOutline = [];
-let yOutline = [];
-let tempx, tempy;
+        // Leaf outline
+        let nLeafPoints = 12;
+        let xOutline = [], yOutline = [];
+        let tempx, tempy;
 
-function setup() {
-    let canvas = createCanvas(windowWidth, windowHeight);
-    canvas.parent(document.body); // Explicitly set parent
-    canvasWidth = width;
-    canvasHeight = height;
-    
-    frameRate(30);
-    
-    leafColor = color(100, 100, 100, 240);
-    branchColor = color(100, 100, 100);
-    skyColor = color(255, 255, 255);
-    
-    initializeTreeValues();
-    windDirection = 0;
-    windVelocity = 0;
-    velIncrement = random(0.01, 0.1);
-    windspeedIncrement = random(0.1, 0.5);
-    defineLeafOutline();
-    generateBranches();
-    redrawTrees();
-}
-function draw() {
-    
-    if (!pauseWind) {
-        updateWind();
-        
-        for (let i = 0; i < treeNumber; i++) {
-            branches[i].rotateDueToWind();
-        }
-        
-        redrawTrees();
-        
-        // Always draw the control panel
-        drawControlPanel();
+        function setup() {
+            let cnv = createCanvas(windowWidth, windowHeight);
+            cnv.parent(document.body);
 
-        if (drawWind) {
-            drawWindLine();
-        }
-    }
-    else {
-        // Always draw the control panel
-    drawControlPanel();
-    }
-    
-}
+            frameRate(30);
+            leafColor = color(100, 100, 100, 240);
+            branchColor = color(100, 100, 100);
+            skyColor = color(255, 255, 255);
 
-function redrawTrees() {
-    background(skyColor);
-    drawBranches();
-    if (drawLeaves) {
-        drawLeavesFunc();
-    }
-}
-
-function drawBranches() {
-    stroke(branchColor);
-    for (let i = 0; i < treeNumber; i++) {
-        branches[i].drawBranch([
-            canvasWidth / 2,  // Changed: centered horizontally
-            canvasHeight*8/9      // Tree base at bottom of window
-        ]);
-    }
-}
-
-function drawLeavesFunc() {
-    noStroke();
-    fill(leafColor);
-    for (let i = 0; i < treeNumber; i++) {
-        branches[i].drawLeaves([
-            (1 + i) * (canvasWidth / (1 + treeNumber)), 
-            canvasHeight
-        ]);
-    }
-}
-
-function drawWindLine() {
-    stroke('#6e956c');
-    strokeWeight(.5);
-    let dx = 200;
-    let dy = 85;
-    let lineLength = 150;
-    line(dx, dy, dx + lineLength * windVelocity * cos(windDirection), dy + lineLength * windVelocity * sin(windDirection));
-    
-    // Draw origin point
-    noStroke();
-    fill('#6e956c');
-    ellipse(dx, dy, 8, 8);
-}
-
-function drawControlPanel() {
-    textAlign(RIGHT, TOP); 
-    textSize(10);
-    let y = 78;
-    let lineHeight = 22;
-    fill(100);
-    let rightX = width - 20;
-    text('tap or space to grow a new tree', rightX, y);
-    text('\nspeed: ' + windVelocity.toFixed(1), rightX, y);
-}
-function drawControlPanel2() {
-    
-    // Title
-    fill(0);
-    textSize(20);
-    textAlign(RIGHT, TOP);  // Changed to RIGHT
-    
-    // Instructions
-    textSize(10);
-    let y = 78;
-    let lineHeight = 22;
-    fill(100);
-
-    // Change x position to width - margin (e.g., width - 20)
-    let rightX = width - 20;
- 
-    // text('↑↓  wind speed', rightX, y);
-    // y += lineHeight;
-    // text('←→  wind direction', rightX, y);\
-    text('speed: ' + windVelocity.toFixed(1), rightX, y);
-    // y += lineHeight;
-    text('\npress: spacebar\n P\n L', rightX, y);
-    // y += lineHeight;
-    // text('p  pause play', rightX, y);
-    y += lineHeight;
-    
-    
-    // text('l  leaves', rightX, y);
-    // y += lineHeight;
-    // text('+-  leaf transparency', rightX, y);
-    // y += lineHeight;
-    // text('m  wind indicator', rightX, y);
-    
-    // Status
-    y += lineHeight + 5;
-    fill(100);
-    //y += lineHeight;
-    
-    // text('speed: ' + windVelocity.toFixed( 1), rightX, y);
-    //y += lineHeight;
-    //text('wind: ' + (pauseWind ? 'Paused' : 'Active'), rightX, y);
-    //y += lineHeight;
-    //text('Leaves: ' + (drawLeaves ? 'Visible' : 'Hidden'), rightX, y);
-}
-
-function initializeTreeValues() {
-    pauseWind = false;
-    drawWind = false;
-    drawLeaves = true;
-    
-    nSegments = Math.max(Math.round(windowHeight * 0.03), 7);
-    totalBranchLength = windowWidth * 0.4;
-    maxBranchThickness = windowWidth * 0.005;
-    maxBranchSizeForLeaves = 5;
-    minBranchThickness = 2;
-    minSpawnDistance = 0.1;
-    branchSpawnOdds = 0.3;
-    branchSpawnOddsOfSecond = 0;
-    mindThetaSplit = 0;
-    maxdThetaSplit = PI / 5;
-    maxdThetaWander = PI / 5;
-    dBranchSize = 0.2;
-    
-    minLength = 3;
-    maxLength = 20;
-    minWidth = 0.4;
-    maxWidth = 0.5;
-    leafSpawnOdds = 1.0;
-    transparency = 240;
-}
-
-function windowResized() {
-    resizeCanvas(windowWidth, windowHeight);
-    canvasWidth = width;
-    canvasHeight = height;
-    initializeTreeValues(); // Recalculate tree proportions
-    generateBranches(); // Regenerate tree with new size
-    redrawTrees();
-}
-
-// Mobile touch support
-function touchStarted() {
-    // Don't regenerate tree if touching UI elements (top 60px or bottom 60px of screen)
-    if (touches.length > 0) {
-        const touchY = touches[0].y;
-        
-        // Skip if touching navigation area (top) or more info link (bottom)
-        if (touchY < 60 || touchY > windowHeight - 60) {
-            return true; // Allow default behavior (navigation)
-        }
-        
-        // Otherwise, generate new tree
-        generateBranches();
-        windDirection = random(TWO_PI);
-        redrawTrees();
-        return false; // Prevent default
-    }
-}
-
-function keyPressed() {
-    // Spacebar to regenerate tree
-    if (key === ' ') {
-        generateBranches();
-        windDirection = random(TWO_PI);
-        redrawTrees();
-    }
-    
-    // Arrow keys for wind speed
-    if (keyCode === UP_ARROW && !pauseWind && windVelocity < 8) {
-        windVelocity++;
-        windspeed++;
-    }
-    if (keyCode === DOWN_ARROW && !pauseWind && windVelocity > 0 && windspeed > 1) {
-        windVelocity += 0.5;
-        windspeed -= 0.5;
-        if (windspeed < 0.5) {
-            pauseWind = !pauseWind;
-        }
-    }
-    
-    // Arrow keys for wind direction
-    if (keyCode === LEFT_ARROW) {
-        windDirection -= 0.1;
-        windDirection = (windDirection + TWO_PI) % TWO_PI;
-    }
-    if (keyCode === RIGHT_ARROW) {
-        windDirection += 0.1;
-        windDirection = (windDirection + TWO_PI) % TWO_PI;
-    }
-    
-    // Number keys for page navigation
-    if (key === '1') {
-        window.location.href = 'index.html';
-    }
-    if (key === '2') {
-        window.location.href = 'canvas.html';
-    }
-    if (key === '3') {
-        window.location.href = 'links.html';
-    }
-    
-    redrawTrees();
-}
-
-function keyTyped() {
-    if (key === 'm') {
-        drawWind = !drawWind;
-        console.log(drawWind);
-    }
-    if (key === 'l') {  // Changed from '1' to 'l' for leaves
-        drawLeaves = !drawLeaves;
-    }
-    if (key === 'p') {
-        pauseWind = !pauseWind;
-        if (pauseWind) {
+            initializeTreeValues();
+            windDirection = 0;
             windVelocity = 0;
+            velIncrement = random(0.01, 0.1);
+            windspeedIncrement = random(0.1, 0.5);
+            defineLeafOutline();
+            generateBranches();
+            redrawTrees();
         }
-    }
-    if (key === '=') {
-        if (transparency < 240) {
-            transparency += 10;
-            leafColor = color(100, 100, 100, transparency);
-        }
-        console.log("transparency: " + transparency);
-    }
-    if (key === '-') {
-        if (transparency > 0) {
-            transparency -= 10;
-            leafColor = color(100, 100, 100, transparency);
-        }
-        console.log("transparency: " + transparency);
-    }
-    redrawTrees();
-}
 
-function generateBranches() {
-    branches = [];
-    for (let i = 0; i < treeNumber; i++) {
-        branches[i] = new Branch(-1, 3 * PI / 2, totalBranchLength, maxBranchThickness);
-    }
-}
-
-class Branch {
-    constructor(indexO, thetaI, totalLength, startingThicknessO) {
-        this.index = indexO;
-        this.myChildren = [];
-        this.myLeaves = [];
-        this.segmentLength = totalLength / nSegments;
-        this.startingThickness = startingThicknessO;
-        this.thetaO = thetaI;
-        this.thetas = new Array(nSegments);
-        this.thetas[0] = this.thetaO;
-        this.x = 0;
-        this.y = 0;
-        
-        for (let i = 1; i < nSegments; i++) {
-            this.thetas[i] = this.thetas[i - 1] + random(-maxdThetaWander, maxdThetaWander);
+        function draw() {
+            if (!pauseWind) {
+                updateWind();
+                for (let i = 0; i < treeNumber; i++) branches[i].rotateDueToWind();
+                redrawTrees();
+                drawControlPanel();
+                if (drawWind) drawWindLine();
+            } else {
+                drawControlPanel();
+            }
         }
+
+        function redrawTrees() {
+            background(skyColor);
+            drawBranches();
+            if (drawLeaves) drawLeavesFunc();
+        }
+
+        function drawBranches() {
+            stroke(branchColor);
+            for (let i = 0; i < treeNumber; i++) {
+                branches[i].drawBranch([width / 2, height * 8/9]);
+            }
+        }
+
+        function drawLeavesFunc() {
+            noStroke();
+            fill(leafColor);
+            for (let i = 0; i < treeNumber; i++) {
+                branches[i].drawLeaves([(1 + i) * (width / (1 + treeNumber)), height]);
+            }
+        }
+
+        function drawWindLine() {
+            stroke('#6e956c');
+            strokeWeight(0.5);
+            let dx = 200, dy = 85, lineLength = 150;
+            line(dx, dy, dx + lineLength * windVelocity * cos(windDirection), dy + lineLength * windVelocity * sin(windDirection));
+            noStroke();
+            fill('#6e956c');
+            ellipse(dx, dy, 8, 8);
+        }
+
+        function drawControlPanel() {
+        // Smooth the wind value so it doesn't jump around
+        smoothedWind = lerp(smoothedWind, windVelocity * 4, 0.05);
         
-        // Spawn baby branches
-        for (let i = 1; i < nSegments; i++) {
-            if (startingThicknessO * (1 - i / nSegments) > minBranchThickness &&
-                i / nSegments > minSpawnDistance &&
-                random(1) <= branchSpawnOdds) {
-                
-                let dThetaSign = randomSign();
-                this.myChildren.push(
-                    new Branch(i,
-                        this.thetas[i] + dThetaSign * random(mindThetaSplit, maxdThetaSplit),
-                        totalLength * (1 - i / nSegments) * random(1 - dBranchSize, 1 + dBranchSize),
-                        startingThicknessO * (1 - i / nSegments))
-                );
-                
-                if (random(1) <= branchSpawnOddsOfSecond) {
-                    this.myChildren.push(
-                        new Branch(i,
-                            this.thetas[i] - dThetaSign * random(mindThetaSplit, maxdThetaSplit),
+        textAlign(RIGHT, TOP);
+        textFont('DM Sans');
+        let fontSize = height * 0.016;
+        textSize(fontSize);
+        fill(150);
+        let rightX = width - 20;
+        let y = 25 + height * 0.05;
+        text('tap or space to grow a new tree', rightX, y);
+        y += fontSize * 2;
+        text('wind: ' + smoothedWind.toFixed(1) + ' mph', rightX, y);
+    }
+        function initializeTreeValues() {
+            pauseWind = false;
+            drawWind = false;
+            drawLeaves = true;
+
+            const isMobile = windowWidth <= 768;
+            nSegments = Math.max(Math.round(windowHeight * 0.02), 7);
+            totalBranchLength = isMobile ? windowHeight * 0.5 : windowWidth * 0.4;
+            maxBranchThickness = isMobile ? windowWidth * 0.01 : windowWidth * 0.006;
+            maxBranchSizeForLeaves = 5;
+            minBranchThickness = 2;
+            minSpawnDistance = 0.1;
+            branchSpawnOdds = isMobile ? 0.7 : 0.3;
+            branchSpawnOddsOfSecond = isMobile ? 0.5 : 0;
+            mindThetaSplit = 0;
+            maxdThetaSplit = PI / 5;
+            maxdThetaWander = isMobile ? PI / 8 : PI / 5;
+            dBranchSize = 0.2;
+            minLength = 3;
+            maxLength = 20;
+            minWidth = 0.4;
+            maxWidth = 0.5;
+            leafSpawnOdds = 1.0;
+            transparency = 240;
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+            initializeTreeValues();
+            generateBranches();
+            redrawTrees();
+        }
+
+        function touchStarted() {
+            if (touches.length > 0) {
+                const touchY = touches[0].y;
+                if (touchY < 60 || touchY > windowHeight - 60) return true;
+                generateBranches();
+                windDirection = random(TWO_PI);
+                redrawTrees();
+                return false;
+            }
+        }
+
+        function keyPressed() {
+            if (key === ' ') { generateBranches(); windDirection = random(TWO_PI); redrawTrees(); }
+            if (keyCode === UP_ARROW && !pauseWind && windVelocity < 8) { windVelocity++; windspeed++; }
+            if (keyCode === DOWN_ARROW && !pauseWind && windVelocity > 0 && windspeed > 1) {
+                windVelocity += 0.5; windspeed -= 0.5;
+                if (windspeed < 0.5) pauseWind = !pauseWind;
+            }
+            if (keyCode === LEFT_ARROW) windDirection = (windDirection - 0.1 + TWO_PI) % TWO_PI;
+            if (keyCode === RIGHT_ARROW) windDirection = (windDirection + 0.1) % TWO_PI;
+            if (key === '1') window.location.href = 'index.html';
+            if (key === '2') window.location.href = 'canvas.html';
+            if (key === '3') window.location.href = 'links.html';
+            redrawTrees();
+        }
+
+        function keyTyped() {
+            if (key === 'm') drawWind = !drawWind;
+            if (key === 'l') drawLeaves = !drawLeaves;
+            if (key === 'p') { pauseWind = !pauseWind; if (pauseWind) windVelocity = 0; }
+            if (key === '=' && transparency < 240) { transparency += 10; leafColor = color(100, 100, 100, transparency); }
+            if (key === '-' && transparency > 0) { transparency -= 10; leafColor = color(100, 100, 100, transparency); }
+            redrawTrees();
+        }
+
+        function generateBranches() {
+            branches = [];
+            for (let i = 0; i < treeNumber; i++) {
+                branches[i] = new Branch(-1, 3 * PI / 2, totalBranchLength, maxBranchThickness);
+            }
+        }
+
+        class Branch {
+            constructor(indexO, thetaI, totalLength, startingThicknessO) {
+                this.index = indexO;
+                this.myChildren = [];
+                this.myLeaves = [];
+                this.segmentLength = totalLength / nSegments;
+                this.startingThickness = startingThicknessO;
+                this.thetaO = thetaI;
+                this.thetas = new Array(nSegments);
+                this.thetas[0] = this.thetaO;
+                this.x = 0;
+                this.y = 0;
+
+                for (let i = 1; i < nSegments; i++) {
+                    this.thetas[i] = this.thetas[i - 1] + random(-maxdThetaWander, maxdThetaWander);
+                }
+
+                for (let i = 1; i < nSegments; i++) {
+                    if (startingThicknessO * (1 - i / nSegments) > minBranchThickness &&
+                        i / nSegments > minSpawnDistance && random(1) <= branchSpawnOdds) {
+                        let dThetaSign = randomSign();
+                        this.myChildren.push(new Branch(i,
+                            this.thetas[i] + dThetaSign * random(mindThetaSplit, maxdThetaSplit),
                             totalLength * (1 - i / nSegments) * random(1 - dBranchSize, 1 + dBranchSize),
-                            startingThicknessO * (1 - i / nSegments))
-                    );
+                            startingThicknessO * (1 - i / nSegments)));
+                        if (random(1) <= branchSpawnOddsOfSecond) {
+                            this.myChildren.push(new Branch(i,
+                                this.thetas[i] - dThetaSign * random(mindThetaSplit, maxdThetaSplit),
+                                totalLength * (1 - i / nSegments) * random(1 - dBranchSize, 1 + dBranchSize),
+                                startingThicknessO * (1 - i / nSegments)));
+                        }
+                    }
+                }
+
+                for (let i = 1; i < nSegments; i++) {
+                    if (startingThicknessO * (1 - i / nSegments) < maxBranchSizeForLeaves && random(1) < leafSpawnOdds) {
+                        this.myLeaves.push(new Leaf(this.thetas[i], i));
+                    }
+                }
+            }
+
+            getCoordsOf(n) {
+                let x2 = this.x, y2 = this.y;
+                for (let i = 0; i < n; i++) {
+                    x2 += this.segmentLength * cos(this.thetas[i]);
+                    y2 += this.segmentLength * sin(this.thetas[i]);
+                }
+                return [x2, y2];
+            }
+
+            rotate(dTheta) {
+                for (let i = 0; i < nSegments; i++) this.thetas[i] += dTheta;
+                for (let leaf of this.myLeaves) leaf.rotate(dTheta);
+                for (let child of this.myChildren) child.rotate(dTheta);
+            }
+
+            rotateDueToWind() {
+                let dThetaWind = this.thetas[0] - windDirection;
+                if (dThetaWind > PI) dThetaWind = -(TWO_PI - dThetaWind);
+                else if (dThetaWind < -PI) dThetaWind = TWO_PI + dThetaWind;
+
+                let forceOfBranch = -(this.thetas[0] - this.thetaO) * ((this.startingThickness / maxBranchThickness) * 1.1);
+                let forceOfWind = -windVelocity * sin(dThetaWind) / 10;
+                let moveAmount = noise(random(16, 24)) * 50;
+                this.rotate((forceOfBranch + forceOfWind) / moveAmount);
+
+                for (let leaf of this.myLeaves) leaf.moveFromWind();
+                for (let child of this.myChildren) child.rotateDueToWind();
+            }
+
+            drawBranch(coords) {
+                this.x = coords[0]; this.y = coords[1];
+                let x1 = this.x, y1 = this.y, x2, y2;
+                for (let i = 0; i < nSegments; i++) {
+                    x2 = x1 + this.segmentLength * cos(this.thetas[i]);
+                    y2 = y1 + this.segmentLength * sin(this.thetas[i]);
+                    strokeWeight(this.startingThickness * (1 - i / nSegments));
+                    line(x1, y1, x2, y2);
+                    x1 = x2; y1 = y2;
+                }
+                for (let child of this.myChildren) child.drawBranch(this.getCoordsOf(child.index));
+            }
+
+            drawLeaves(coords) {
+                for (let leaf of this.myLeaves) leaf.draw(this.getCoordsOf(leaf.index));
+                for (let child of this.myChildren) child.drawLeaves(coords);
+            }
+        }
+
+        class Leaf {
+            constructor(thetaBranch, indexO) {
+                this.thetaO = thetaBranch + randomSign() * random(PI / 6, PI / 3);
+                this.dTheta = 0;
+                this.myWidth = random(minWidth, maxWidth);
+                this.myLength = random(minLength, maxLength);
+                this.index = indexO;
+            }
+
+            moveFromWind() {
+                let dThetaWind = ((this.thetaO + this.dTheta) - windDirection) % TWO_PI;
+                if (dThetaWind > PI) dThetaWind = -(TWO_PI - dThetaWind);
+                else if (dThetaWind < -PI) dThetaWind = TWO_PI + dThetaWind;
+                this.thetaO = (this.thetaO + TWO_PI) % TWO_PI;
+                let forceOfLeaf = -(this.dTheta) / PI;
+                let forceOfWind = -windVelocity * sin(dThetaWind);
+                let LeafForce = noise(random(20, 30)) * 30;
+                this.dTheta += (forceOfLeaf + forceOfWind) / LeafForce;
+            }
+
+            rotate(deltaTheta) { this.dTheta += deltaTheta; }
+
+            draw(coord) {
+                let x = coord[0], y = coord[1];
+                let LeafJitter = -windVelocity * sin(((this.thetaO + this.dTheta) - windDirection) % TWO_PI);
+                drawLeaf(x, y, this.myLength, this.myWidth, (this.thetaO + this.dTheta) + random(LeafJitter) * 0.5);
+            }
+        }
+
+        function randomSign() {
+            let num = random(-1, 1);
+            return num === 0 ? -1 : num / abs(num);
+        }
+
+        function defineLeafOutline() {
+            xOutline = new Array(nLeafPoints);
+            yOutline = new Array(nLeafPoints);
+            for (let i = 0; i <= nLeafPoints / 2; i++) {
+                xOutline[i] = 2 * i / nLeafPoints;
+                yOutline[i] = -pow(xOutline[i] - 0.5, 2) + 0.25;
+                if (i > 0 && i <= nLeafPoints / 2) {
+                    xOutline[nLeafPoints - i] = xOutline[i];
+                    yOutline[nLeafPoints - i] = -yOutline[i];
                 }
             }
         }
-        
-        // Add leaves
-        for (let i = 1; i < nSegments; i++) {
-            if (startingThicknessO * (1 - i / nSegments) < maxBranchSizeForLeaves && 
-                random(1) < leafSpawnOdds) {
-                this.myLeaves.push(new Leaf(this.thetas[i], i));
+
+        function drawLeaf(x, y, leafLength, leafWidth, direction) {
+            beginShape();
+            for (let i = 0; i < xOutline.length; i++) {
+                tempx = xOutline[i] * cos(direction) * leafLength - yOutline[i] * sin(direction) * leafWidth * leafLength;
+                tempy = xOutline[i] * sin(direction) * leafLength + yOutline[i] * cos(direction) * leafWidth * leafLength;
+                vertex(x + tempx, y + tempy);
             }
+            endShape(CLOSE);
         }
-    }
-    
-    getCoordsOf(n) {
-        let x2 = this.x;
-        let y2 = this.y;
-        for (let i = 0; i < n; i++) {
-            x2 += this.segmentLength * cos(this.thetas[i]);
-            y2 += this.segmentLength * sin(this.thetas[i]);
-        }
-        return [x2, y2];
-    }
-    
-    rotate(dTheta) {
-        for (let i = 0; i < nSegments; i++) {
-            this.thetas[i] += dTheta;
-        }
-        
-        for (let i = 0; i < this.myLeaves.length; i++) {
-            this.myLeaves[i].rotate(dTheta);
-        }
-        
-        for (let i = 0; i < this.myChildren.length; i++) {
-            this.myChildren[i].rotate(dTheta);
-        }
-    }
-    
-    rotateDueToWind() {
-        let dThetaWind = this.thetas[0] - windDirection;
-        let dThetaBranch = this.thetas[0] - this.thetaO;
-        
-        if (dThetaWind > PI) {
-            dThetaWind = -(TWO_PI - dThetaWind);
-        } else if (dThetaWind < -PI) {
-            dThetaWind = TWO_PI + dThetaWind;
-        }
-        
-        if (dThetaBranch > PI) {
-            dThetaBranch = -(TWO_PI - dThetaBranch);
-        } else if (dThetaBranch < -PI) {
-            dThetaBranch = TWO_PI + dThetaBranch;
-        }
-        
-        let forceOfBranch = -(this.thetas[0] - this.thetaO) * ((this.startingThickness / maxBranchThickness) * 1.1);
-        let forceOfWind = -windVelocity * sin(dThetaWind) / 10;
-        let moveAmount = noise(random(16, 24)) * 50;
-        
-        this.rotate((forceOfBranch + forceOfWind) / moveAmount);
-        
-        for (let i = 0; i < this.myLeaves.length; i++) {
-            this.myLeaves[i].moveFromWind();
-        }
-        
-        for (let i = 0; i < this.myChildren.length; i++) {
-            this.myChildren[i].rotateDueToWind();
-        }
-    }
-    
-    drawBranch(coords) {
-        this.x = coords[0];
-        this.y = coords[1];
-        let x1 = this.x;
-        let y1 = this.y;
-        let x2, y2;
-        
-        for (let i = 0; i < nSegments; i++) {
-            x2 = x1 + this.segmentLength * cos(this.thetas[i]);
-            y2 = y1 + this.segmentLength * sin(this.thetas[i]);
-            strokeWeight(this.startingThickness * (1 - i / nSegments));
-            line(x1, y1, x2, y2);
-            x1 = x2;
-            y1 = y2;
-        }
-        
-        for (let i = 0; i < this.myChildren.length; i++) {
-            this.myChildren[i].drawBranch(this.getCoordsOf(this.myChildren[i].index));
-        }
-    }
-    
-    drawLeaves(coords) {
-        for (let i = 0; i < this.myLeaves.length; i++) {
-            this.myLeaves[i].draw(this.getCoordsOf(this.myLeaves[i].index));
-        }
-        
-        for (let i = 0; i < this.myChildren.length; i++) {
-            this.myChildren[i].drawLeaves(coords);
-        }
-    }
-}
 
-function randomSign() {
-    let num = random(-1, 1);
-    if (num === 0) {
-        return -1;
-    } else {
-        return num / abs(num);
-    }
-}
-
-function defineLeafOutline() {
-    xOutline = new Array(nLeafPoints);
-    yOutline = new Array(nLeafPoints);
-    
-    for (let i = 0; i <= nLeafPoints / 2; i++) {
-        xOutline[i] = 2 * i / nLeafPoints;
-        yOutline[i] = (-pow((xOutline[i] - 0.5), 2) + 0.25);
-        
-        if (i > 0 && i <= nLeafPoints / 2) {
-            xOutline[nLeafPoints - i] = xOutline[i];
-            yOutline[nLeafPoints - i] = -yOutline[i];
+        function updateWind() {
+            velOff += velIncrement;
+            windspeed += windspeedIncrement;
+            windDirection = (windDirection - 0.001 + TWO_PI) % TWO_PI;
+            if (windspeed >= limit) windspeed -= windspeedIncrement;
+            windVelocity = windspeed * noise(velOff) - 1;
         }
-    }
-}
-
-function drawLeaf(x, y, leafLength, leafWidth, direction) {
-    beginShape();
-    for (let i = 0; i < xOutline.length; i++) {
-        tempx = xOutline[i] * cos(direction) * leafLength - yOutline[i] * sin(direction) * leafWidth * leafLength;
-        tempy = xOutline[i] * sin(direction) * leafLength + yOutline[i] * cos(direction) * leafWidth * leafLength;
-        vertex(x + tempx, y + tempy);
-    }
-    endShape(CLOSE);
-}
-
-class Leaf {
-    constructor(thetaBranch, indexO) {
-        this.thetaO = thetaBranch + randomSign() * random(PI / 6, PI / 3);
-        this.dTheta = 0;
-        this.myWidth = random(minWidth, maxWidth);
-        this.myLength = random(minLength, maxLength);
-        this.index = indexO;
-    }
-    
-    moveFromWind() {
-        let dThetaWind = ((this.thetaO + this.dTheta) - windDirection) % TWO_PI;
-        
-        if (dThetaWind > PI) {
-            dThetaWind = -(TWO_PI - dThetaWind);
-        } else if (dThetaWind < -PI) {
-            dThetaWind = TWO_PI + dThetaWind;
-        }
-        
-        this.thetaO = (this.thetaO + TWO_PI) % TWO_PI;
-        let forceOfLeaf = -(this.dTheta) / PI;
-        let forceOfWind = -windVelocity * sin(dThetaWind);
-        let LeafForce = (noise(random(20, 30)) * 30);
-        this.dTheta += (forceOfLeaf + forceOfWind) / LeafForce;
-    }
-    
-    rotate(deltaTheta) {
-        this.dTheta += deltaTheta;
-    }
-    
-    draw(coord) {
-        let x = coord[0];
-        let y = coord[1];
-        let LeafJitter = (-windVelocity * sin(((this.thetaO + this.dTheta) - windDirection) % TWO_PI));
-        drawLeaf(x, y, this.myLength, this.myWidth, ((this.thetaO + this.dTheta) + (random(LeafJitter) * 0.5)));
-    }
-}
-
-function updateWind() {
-    velOff += velIncrement;
-    windspeed += windspeedIncrement;
-    windDirection = (windDirection - 0.001 + TWO_PI) % TWO_PI;
-    
-    if (windspeed >= limit) {
-        windspeed -= windspeedIncrement;
-    }
-    windVelocity = (windspeed) * noise(velOff) - 1;
-}
-
-function windowResized() {
-    resizeCanvas(windowWidth, windowHeight);
-    canvasWidth = width;
-    canvasHeight = height;
-    redrawTrees();
-}
     </script>
-</script>
-    
-<!-- More info link -->
-<a id="more-info" href="http://byamandasun.com/code/billington" target="_blank">for more info</a>
 </body>
 </html>

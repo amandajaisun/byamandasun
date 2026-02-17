@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Canvas</title>
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
     <style>
-        
         * {
             margin: 0;
             padding: 0;
@@ -18,7 +19,7 @@
             overflow: hidden;
             cursor: grab;
             user-select: none;
-            font-family: nyt-imperial, georgia, 'times new roman', times, serif;
+            font-family: 'DM Sans', sans-serif;
         }
 
         body.grabbing {
@@ -61,28 +62,32 @@
             display: flex;
             gap: 16px;
             z-index: 100;
+            line-height: 1;
         }
 
         .nav-item {
             text-decoration: none;
             color: #607466;
-            font-size: 16px;
+            font-size: clamp(14px, 2.5vw, 32px);
+            font-family: 'DM Sans', sans-serif;
             transition: color 0.2s;
             cursor: pointer;
         }
 
-          /* Signature */
-          #signature {
+        .nav-item.active {
+            color: #343E3D;
+        }
+
+        /* Signature */
+        #signature {
             position: fixed;
             top: 20px;
             right: 20px;
             color: #343E3D;
-            font-size: 14px;
+            font-size: clamp(14px, 2.5vw, 32px);
+            font-family: 'DM Sans', sans-serif;
             z-index: 100;
-        }
-
-        .nav-item.active {
-            color: #343E3D;
+            line-height: 1;
         }
 
         /* Zoom overlay */
@@ -111,143 +116,118 @@
         #zoom-caption {
             margin-top: 20px;
             color: #607466;
-            font-size: 16px;
+            font-size: clamp(12px, 1.5vw, 20px);
             text-align: center;
         }
 
         /* Arrow navigation buttons */
-       /* Arrow navigation buttons */
-.zoom-arrow {
-    position: fixed;
-    top: 50%;
-    transform: translateY(-50%);
-    background: transparent;
-    border: none;
-    color: #607466;
-    font-size: 24px;  /* Changed from 48px to 24px */
-    width: 40px;      /* Changed from 60px to 40px */
-    height: 40px;     /* Changed from 60px to 40px */
-    cursor: pointer;
-    z-index: 201;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    transition: color 0.2s;
-}
+        .zoom-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: #607466;
+            font-size: clamp(16px, 2vw, 28px);
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            z-index: 201;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
 
-.zoom-arrow:hover {
-    color: #343E3D;
-}
+        .zoom-arrow:hover { color: #343E3D; }
+        .zoom-arrow.visible { display: flex; }
 
-.zoom-arrow.visible {
-    display: flex;
-}
-
-#prev-arrow {
-    left: 20px;
-}
-
-#next-arrow {
-    right: 20px;
-}
+        #prev-arrow { left: 20px; }
+        #next-arrow { right: 20px; }
 
         #escape-hint {
             position: fixed;
             top: 20px;
             right: 20px;
             color: #607466;
-            font-size: 12px;
+            font-size: clamp(10px, 1vw, 14px);
+            font-family: 'DM Sans', sans-serif;
             z-index: 201;
             display: none;
         }
 
-        #escape-hint.visible {
-            display: block;
+        #escape-hint.visible { display: block; }
+
+        /* Desktop: hide mobile captions */
+        .mobile-caption { display: none; }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            body {
+                cursor: default;
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+
+            body.grabbing { cursor: default; }
+
+            #canvas-container {
+                width: 100vw;
+                height: auto;
+                position: relative;
+                overflow: visible;
+            }
+
+            #canvas {
+                width: 100vw;
+                height: auto;
+                position: relative;
+                transform: none !important;
+                transition: none;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 80px 20px 40px;
+                gap: 40px;
+                z-index: 1;
+            }
+
+            .image-item {
+                position: relative !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 90vw !important;
+                height: auto !important;
+                max-width: 500px;
+                cursor: default;
+            }
+
+            .image-item img {
+                width: 100%;
+                height: auto;
+                object-fit: contain;
+            }
+
+            .mobile-caption {
+                display: block !important;
+                margin-top: 10px;
+                color: #607466;
+                font-size: 12px;
+                text-align: center;
+                padding: 0 10px;
+            }
+
+            .nav-item { font-size: 14px; }
+            #signature { font-size: 14px; }
+            .zoom-arrow { display: none !important; }
+            #zoom-overlay { display: none !important; }
+            #escape-hint { display: none !important; }
         }
-
-/* Desktop: hide mobile captions */
-.mobile-caption {
-    display: none;
-}
-
-/* Mobile styles */
-@media (max-width: 768px) {
-    body {
-        cursor: default;
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
-
-    body.grabbing {
-        cursor: default;
-    }
-
-    #canvas-container {
-        width: 100vw;
-        height: auto;
-        position: relative;
-        overflow: visible;
-    }
-
-    #canvas {
-        width: 100vw;
-        height: auto;
-        position: relative;
-        transform: none !important;
-        transition: none;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 80px 20px 40px;
-        gap: 40px;
-    }
-
-    .image-item {
-        position: relative !important;
-        left: 0 !important;
-        top: 0 !important;
-        width: 90vw !important;
-        height: auto !important;
-        max-width: 500px;
-        cursor: default;
-    }
-
-    .image-item img {
-        width: 100%;
-        height: auto;
-        object-fit: contain;
-    }
-
-    .mobile-caption {
-        display: block !important;  /* Added !important to override */
-        margin-top: 10px;
-        color: #607466;
-        font-size: 12px;
-        text-align: center;
-        padding: 0 10px;
-    }
-
-    /* Hide arrows on mobile */
-    .zoom-arrow {
-        display: none !important;
-    }
-
-    /* Hide zoom overlay on mobile */
-    #zoom-overlay {
-        display: none !important;
-    }
-
-    #escape-hint {
-        display: none !important;
-    }
-}
     </style>
 </head>
 <body>
     <div id="canvas-container">
-        <div id="canvas">
-            <!-- Images will be added here -->
-        </div>
+        <div id="canvas"></div>
     </div>
 
     <!-- Zoom overlay -->
@@ -269,54 +249,45 @@
         <a href="canvas.html" class="nav-item active" data-key="2">2</a>
         <a href="links.html" class="nav-item" data-key="3">3</a>
     </nav>
+
+    <!-- Signature -->
+    <div id="signature">amanda sun</div>
+
     <script>
         // ========================================
         // CONFIGURE YOUR IMAGES HERE
         // ========================================
-        // Calculate scale based on viewport
-const imageScale = Math.min(window.innerWidth / 1000, 1); // Scale based on 1920px baseline, max 1x
-
-const images = [
-    // Add your images like this:
-    // { src: 'path/to/your/image1.jpg', width: 400, height: 300, caption: 'Your caption' },
-    
-    
-    // Placeholder images (replace these with your own):
-    { src: 'imgs/animation/Puppy-GIF.gif', width: 400 * imageScale, height: 500 * imageScale, caption: 'self taught, procreate + adobe aftereffects' },
-    { src: 'imgs/animation/cervest_animation_folder.gif', width: 400 * imageScale, height: 400 * imageScale, caption: 'motion design internship, adobe aftereffects' },
-    { src: 'imgs/id/box.jpg', width: 400 * imageScale, height: 400 * imageScale, caption: '6 identical puzzle pieces that slide into a cube, cnc router + prototyping' },
-    { src: 'imgs/illustration/I_miss_empty_nesting.png', width: 450 * imageScale, height: 350 * imageScale },
-    { src: 'imgs/illustration/I-m_Sick_Of_This_Clean_Air.png', width: 380 * imageScale, height: 420 * imageScale },
-    { src: 'imgs/illustration/IMG_0024.jpg', width: 420 * imageScale, height: 600 * imageScale, caption: 'acrylic on skateboard' },
-    { src: 'imgs/illustration/kegshirts5.png', width: 420 * imageScale, height: 320 * imageScale, caption: 'solo business for sold-out tees, procreate' },
-    { src: 'imgs/illustration/Phase_4_Can-t_Come_Quicker.png', width: 500 * imageScale, height: 600 * imageScale },
-];
+        const images = [
+            { src: 'imgs/illustration/IMG_0024.jpg', width: 420, height: 600, caption: 'acrylic on skateboard' },
+            { src: 'imgs/animation/cervest_animation_folder.gif', width: 400, height: 400, caption: 'motion design internship, adobe aftereffects' },
+            { src: 'imgs/id/box.jpg', width: 400, height: 400, caption: '6 identical puzzle pieces that slide into a cube, cnc router + prototyping' },
+            { src: 'imgs/illustration/I_miss_empty_nesting.png', width: 450, height: 350 },
+            { src: 'imgs/illustration/I-m_Sick_Of_This_Clean_Air.png', width: 380, height: 420 },
+            { src: 'imgs/illustration/Phase_4_Can-t_Come_Quicker.png', width: 500, height: 600 },
+            { src: 'imgs/illustration/kegshirts5.png', width: 420, height: 320, caption: 'solo business for sold-out tees, procreate' },
+        ];
         // ========================================
-    
+
         const canvas = document.getElementById('canvas');
         const canvasContainer = document.getElementById('canvas-container');
-    
+
         let scale = 1;
         let isDragging = false;
         let startX, startY;
-        let currentX = 0;
-        let currentY = 0;
+        let currentX = 0, currentY = 0;
         let currentZoomIndex = -1;
         let isMobile = window.innerWidth <= 768;
-    
-        // Generate random positions for images
+
         function getRandomPosition(index, total) {
             const canvasSize = 4000;
             const angle = (index / total) * Math.PI * 2;
             const radius = 600 + Math.random() * 800;
-            
             return {
                 x: canvasSize / 2 + Math.cos(angle) * radius + (Math.random() - 0.5) * 400,
                 y: canvasSize / 2 + Math.sin(angle) * radius + (Math.random() - 0.5) * 400
             };
         }
-    
-        // Create image elements
+
         images.forEach((img, index) => {
             const pos = getRandomPosition(index, images.length);
             const imageEl = document.createElement('div');
@@ -325,70 +296,60 @@ const images = [
             imageEl.style.top = `${pos.y}px`;
             imageEl.style.width = `${img.width}px`;
             imageEl.style.height = `${img.height}px`;
-            
+
             const imgTag = document.createElement('img');
             imgTag.src = img.src;
             imgTag.alt = `Image ${index + 1}`;
             imgTag.draggable = false;
-            
             imageEl.appendChild(imgTag);
-            
-            // Add caption for mobile
+
             if (img.caption) {
                 const captionEl = document.createElement('div');
                 captionEl.className = 'mobile-caption';
                 captionEl.textContent = img.caption;
                 imageEl.appendChild(captionEl);
             }
-            
+
             canvas.appendChild(imageEl);
-            
-            // Add click handler for zoom (only on desktop)
+
             imageEl.addEventListener('click', (e) => {
-                if (!isMobile) {
-                    e.stopPropagation();
-                    showZoomedImage(index);
-                }
+                if (!isMobile) { e.stopPropagation(); showZoomedImage(index); }
             });
         });
-    
+
         function updateTransform() {
             canvas.style.transform = `translate(${currentX}px, ${currentY}px) scale(${scale})`;
         }
-    
-        // Pan functionality
+
         canvasContainer.addEventListener('mousedown', (e) => {
-            if (isMobile) return;
-            if (e.target.closest('.image-item')) return;
+            if (isMobile || e.target.closest('.image-item')) return;
             isDragging = true;
             startX = e.clientX - currentX;
             startY = e.clientY - currentY;
             document.body.classList.add('grabbing');
         });
-    
+
         document.addEventListener('mousemove', (e) => {
             if (!isDragging || isMobile) return;
             currentX = e.clientX - startX;
             currentY = e.clientY - startY;
             updateTransform();
         });
-    
+
         document.addEventListener('mouseup', () => {
             isDragging = false;
             document.body.classList.remove('grabbing');
         });
-    
-        // Zoom functionality
+
         const zoomOverlay = document.getElementById('zoom-overlay');
         const zoomImage = document.getElementById('zoom-image');
         const zoomCaption = document.getElementById('zoom-caption');
         const escapeHint = document.getElementById('escape-hint');
         const prevArrow = document.getElementById('prev-arrow');
         const nextArrow = document.getElementById('next-arrow');
-    
+
         function showZoomedImage(index) {
-            if (isMobile) return; // Disable zoom on mobile
-            
+            if (isMobile) return;
             currentZoomIndex = index;
             const img = images[index];
             zoomImage.src = img.src;
@@ -398,7 +359,7 @@ const images = [
             prevArrow.classList.add('visible');
             nextArrow.classList.add('visible');
         }
-    
+
         function hideZoomedImage() {
             zoomOverlay.classList.remove('active');
             escapeHint.classList.remove('visible');
@@ -408,127 +369,73 @@ const images = [
             zoomCaption.textContent = '';
             currentZoomIndex = -1;
         }
-    
+
         function showNextImage() {
             if (currentZoomIndex >= 0) {
                 currentZoomIndex = (currentZoomIndex + 1) % images.length;
                 showZoomedImage(currentZoomIndex);
             }
         }
-    
+
         function showPreviousImage() {
             if (currentZoomIndex >= 0) {
                 currentZoomIndex = (currentZoomIndex - 1 + images.length) % images.length;
                 showZoomedImage(currentZoomIndex);
             }
         }
-    
+
         zoomOverlay.addEventListener('click', (e) => {
-            // Only close if clicking on the overlay itself, not the arrows
-            if (e.target === zoomOverlay) {
-                hideZoomedImage();
-            }
+            if (e.target === zoomOverlay) hideZoomedImage();
         });
-    
-        // Arrow button handlers
-        prevArrow.addEventListener('click', (e) => {
-            e.stopPropagation();
-            showPreviousImage();
-        });
-    
-        nextArrow.addEventListener('click', (e) => {
-            e.stopPropagation();
-            showNextImage();
-        });
-    
-        // Initial render - center and scale to show all images
+
+        prevArrow.addEventListener('click', (e) => { e.stopPropagation(); showPreviousImage(); });
+        nextArrow.addEventListener('click', (e) => { e.stopPropagation(); showNextImage(); });
+
         function centerToShowAllImages() {
-            if (isMobile) return; // Skip centering on mobile
-            
-            // Calculate bounds of all images
+            if (isMobile) return;
             let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-            
-            const imageElements = document.querySelectorAll('.image-item');
-            imageElements.forEach(el => {
+            document.querySelectorAll('.image-item').forEach(el => {
                 const left = parseFloat(el.style.left);
                 const top = parseFloat(el.style.top);
-                const width = parseFloat(el.style.width);
-                const height = parseFloat(el.style.height);
-                
+                const w = parseFloat(el.style.width);
+                const h = parseFloat(el.style.height);
                 minX = Math.min(minX, left);
                 minY = Math.min(minY, top);
-                maxX = Math.max(maxX, left + width);
-                maxY = Math.max(maxY, top + height);
+                maxX = Math.max(maxX, left + w);
+                maxY = Math.max(maxY, top + h);
             });
-            
-            // Calculate content dimensions
-            const contentWidth = maxX - minX;
-            const contentHeight = maxY - minY;
             const contentCenterX = (minX + maxX) / 2;
             const contentCenterY = (minY + maxY) / 2;
-            
-            // Calculate viewport dimensions
-            const viewportWidth = window.innerWidth;
-            const viewportHeight = window.innerHeight;
-            
-            // Calculate scale to fit all images with padding
-            const scaleX = viewportWidth / contentWidth;
-            const scaleY = viewportHeight / contentHeight;
-            scale = Math.min(scaleX, scaleY) * 0.9; // 90% to add padding
-            
-            // Center the canvas so all images are visible
-            currentX = viewportWidth / 2 - contentCenterX * scale;
-            currentY = viewportHeight / 2 - contentCenterY * scale;
-            
+            const scaleX = window.innerWidth / (maxX - minX);
+            const scaleY = window.innerHeight / (maxY - minY);
+            scale = Math.min(scaleX, scaleY) * 0.9;
+            currentX = window.innerWidth / 2 - contentCenterX * scale;
+            currentY = window.innerHeight / 2 - contentCenterY * scale;
             updateTransform();
         }
-        
+
         centerToShowAllImages();
-        
-        // Recenter on window resize
+
         window.addEventListener('resize', () => {
             isMobile = window.innerWidth <= 768;
             centerToShowAllImages();
         });
-    
-        // Prevent image dragging
+
         document.querySelectorAll('img').forEach(img => {
             img.addEventListener('dragstart', (e) => e.preventDefault());
         });
-    
-        // Keyboard navigation
+
         document.addEventListener('keydown', (e) => {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-            
-            // Escape key to close zoom
-            if (e.key === 'Escape') {
-                hideZoomedImage();
-                return;
-            }
-    
-            // Arrow keys in zoom mode
+            if (e.key === 'Escape') { hideZoomedImage(); return; }
             if (currentZoomIndex >= 0) {
-                if (e.key === 'ArrowLeft') {
-                    showPreviousImage();
-                    return;
-                }
-                if (e.key === 'ArrowRight') {
-                    showNextImage();
-                    return;
-                }
+                if (e.key === 'ArrowLeft') { showPreviousImage(); return; }
+                if (e.key === 'ArrowRight') { showNextImage(); return; }
             }
-            
-            // Number keys for navigation
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                if (item.dataset.key === e.key) {
-                    window.location.href = item.href;
-                }
+            document.querySelectorAll('.nav-item').forEach(item => {
+                if (item.dataset.key === e.key) window.location.href = item.href;
             });
         });
     </script>
-
-    <!-- Signature -->
-    <div id="signature">amanda sun</div>
 </body>
 </html>
