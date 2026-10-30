@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UX/UI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: white;
+            font-family: 'DM Sans', sans-serif;
+            padding: 100px 40px 60px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Navigation */
+        #nav-pane {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 16px;
+            z-index: 100;
+            line-height: 1;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: #607466;
+            font-size: clamp(14px, 2.5vw, 32px);
+            font-family: 'DM Sans', sans-serif;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: #343E3D;
+        }
+
+        /* Signature */
+        #signature {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            color: #343E3D;
+            font-size: clamp(14px, 2.5vw, 32px);
+            font-family: 'DM Sans', sans-serif;
+            z-index: 100;
+            line-height: 1;
+        }
+
+        /* Projects */
+        .intro {
+            font-size: clamp(12px, 1.5vw, 18px);
+            color: #607466;
+            max-width: 560px;
+            margin-bottom: 80px;
+        }
+
+        .project {
+            display: grid;
+            grid-template-columns: 1fr 1.6fr;
+            gap: 48px;
+            align-items: start;
+            margin-bottom: 120px;
+        }
+
+        .project-text {
+            position: sticky;
+            top: 100px;
+        }
+
+        .project-name {
+            font-size: clamp(14px, 2vw, 24px);
+            color: #343E3D;
+            font-weight: normal;
+            margin-bottom: 8px;
+        }
+
+        .project-meta {
+            font-size: clamp(11px, 1.1vw, 14px);
+            color: #607466;
+            margin-bottom: 20px;
+        }
+
+        .project-description {
+            font-size: clamp(12px, 1.3vw, 16px);
+            color: #343E3D;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        .project-description p + p {
+            margin-top: 12px;
+        }
+
+        .project-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #607466;
+            text-decoration: none;
+            font-size: clamp(12px, 1.3vw, 16px);
+            transition: color 0.2s;
+        }
+
+        .project-link:hover {
+            color: #343E3D;
+        }
+
+        .project-media {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .project-media img,
+        .project-media video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .media-caption {
+            margin-top: 8px;
+            font-size: clamp(11px, 1vw, 13px);
+            color: #607466;
+        }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            body { padding: 80px 20px 40px; }
+            .nav-item { font-size: 14px; }
+            #signature { font-size: 14px; }
+            .intro { font-size: 14px; margin-bottom: 48px; }
+            .project {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                margin-bottom: 72px;
+            }
+            .project-text { position: static; }
+            .project-name { font-size: 16px; }
+            .project-meta { font-size: 12px; }
+            .project-description { font-size: 14px; }
+            .project-link { font-size: 14px; }
+            .media-caption { font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Pane -->
+    <nav id="nav-pane">
+        <a href="index.html" class="nav-item" data-key="1">1</a>
+        <a href="canvas.html" class="nav-item" data-key="2">2</a>
+        <a href="ux.html" class="nav-item active" data-key="3">3</a>
+        <a href="links.html" class="nav-item" data-key="4">4</a>
+    </nav>
+
+    <!-- Signature -->
+    <div id="signature">amanda sun</div>
+
+    <div class="container">
+        <div class="intro">ux / ui</div>
+        <div id="projects"></div>
+    </div>
+
+    <script>
+        // ========================================
+        // CONFIGURE YOUR PROJECTS HERE
+        // ========================================
+        // name:        project title
+        // meta:        role, company, year, tools (optional)
+        // description: one string per paragraph
+        // link:        { text, href } (optional)
+        // media:       images, gifs, or videos (.mp4/.webm), each with an optional caption
+        const projects = [
+            {
+                name: 'caltrain',
+                meta: 'ios app concept',
+                description: [
+                    'when is my next train? an at-a-glance way for daily commuters to see the next caltrain.',
+                ],
+                link: { text: 'view case study (password protected)', href: 'caltrain.html' },
+            },
+            {
+                name: 'block duplication',
+                meta: 'squarespace',
+                description: [
+                    'design handoff and edge casing for duplicating blocks in the squarespace editor.',
+                ],
+                media: [
+                    { src: 'imgs/animation/block dup.gif' },
+                ],
+            },
+            // {
+            //     name: 'project name',
+            //     meta: 'role · company · year',
+            //     description: [
+            //         'the problem.',
+            //         'what you did and what changed.',
+            //     ],
+            //     link: { text: 'read more', href: 'https://...' },
+            //     media: [
+            //         { src: 'imgs/ux/example.png', caption: 'final screens' },
+            //     ],
+            // },
+        ];
+        // ========================================
+
+        const projectsEl = document.getElementById('projects');
+
+        projects.forEach(project => {
+            const projectEl = document.createElement('div');
+            projectEl.className = 'project';
+
+            const textEl = document.createElement('div');
+            textEl.className = 'project-text';
+
+            const nameEl = document.createElement('div');
+            nameEl.className = 'project-name';
+            nameEl.textContent = project.name;
+            textEl.appendChild(nameEl);
+
+            if (project.meta) {
+                const metaEl = document.createElement('div');
+                metaEl.className = 'project-meta';
+                metaEl.textContent = project.meta;
+                textEl.appendChild(metaEl);
+            }
+
+            const descEl = document.createElement('div');
+            descEl.className = 'project-description';
+            (project.description || []).forEach(paragraph => {
+                const p = document.createElement('p');
+                p.textContent = paragraph;
+                descEl.appendChild(p);
+            });
+            textEl.appendChild(descEl);
+
+            if (project.link) {
+                const linkEl = document.createElement('a');
+                linkEl.className = 'project-link';
+                linkEl.href = project.link.href;
+                if (/^https?:/.test(project.link.href)) linkEl.target = '_blank';
+                linkEl.textContent = project.link.text + ' →';
+                textEl.appendChild(linkEl);
+            }
+
+            const mediaEl = document.createElement('div');
+            mediaEl.className = 'project-media';
+            (project.media || []).forEach(item => {
+                const figure = document.createElement('div');
+                let el;
+                if (/\.(mp4|webm|mov)$/i.test(item.src)) {
+                    el = document.createElement('video');
+                    el.src = item.src;
+                    el.autoplay = true;
+                    el.loop = true;
+                    el.muted = true;
+                    el.playsInline = true;
+                } else {
+                    el = document.createElement('img');
+                    el.src = item.src;
+                    el.alt = item.caption || project.name;
+                    el.loading = 'lazy';
+                }
+                figure.appendChild(el);
+                if (item.caption) {
+                    const captionEl = document.createElement('div');
+                    captionEl.className = 'media-caption';
+                    captionEl.textContent = item.caption;
+                    figure.appendChild(captionEl);
+                }
+                mediaEl.appendChild(figure);
+            });
+
+            projectEl.appendChild(textEl);
+            projectEl.appendChild(mediaEl);
+            projectsEl.appendChild(projectEl);
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            document.querySelectorAll('.nav-item').forEach(item => {
+                if (item.dataset.key === e.key) window.location.href = item.href;
+            });
+        });
+    </script>
+</body>
+</html>
