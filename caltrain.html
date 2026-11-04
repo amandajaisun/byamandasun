@@ -11,178 +11,74 @@
     <link rel="stylesheet" href="styles.css">
     <script src="site.js" defer></script>
     <style>
-    body {
-        padding: 100px 40px 60px;
-    }
+        body {
+            padding: 100px 40px 60px;
+        }
 
-    @media (max-width: 768px) {
-        body { padding: 80px 20px 40px; }
-    }
+        /* Lock screen */
+        #lock {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-    .case {
-        max-width: 960px;
-        margin: 0 auto;
-        color: var(--ink);
-    }
+            & form {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 16px;
+            }
 
-    .case-header { margin-bottom: 96px; }
+            & label {
+                font-size: var(--size-body);
+            }
 
-    .case h1, .case h2, .case h3 {
-        font-weight: var(--weight-regular);
-    }
+            & button {
+                font-family: var(--font);
+                font-size: clamp(12px, 1.3vw, 16px);
+                color: var(--accent);
+                background: none;
+                border: none;
+                cursor: pointer;
+                transition: var(--weight-transition);
 
-    .case-title {
-        font-size: clamp(28px, 5vw, 56px);
-        line-height: 1.1;
-    }
+                &:hover {
+                    color: var(--ink);
+                    font-weight: var(--weight-hover);
+                }
+            }
+        }
 
-    .case-subtitle {
-        font-size: clamp(16px, 2.2vw, 28px);
-        color: var(--accent);
-        margin-top: 8px;
-    }
+        #password {
+            font-family: var(--font);
+            font-size: 16px;
+            color: var(--ink);
+            border: none;
+            border-bottom: 1px solid var(--accent);
+            padding: 6px 2px;
+            width: 220px;
+            text-align: center;
+            background: transparent;
 
-    .case-meta {
-        font-size: clamp(11px, 1.1vw, 14px);
-        color: var(--accent);
-        margin-top: 24px;
-    }
+            &:focus {
+                border-bottom-color: var(--ink);
+            }
+        }
 
-    .case-section { margin-bottom: 120px; }
+        #lock-message {
+            font-size: var(--size-small);
+            color: var(--accent);
+            min-height: 1.2em;
+        }
 
-    .case .section-title {
-        font-size: clamp(16px, 2vw, 24px);
-        margin-bottom: 24px;
-    }
+        #content[hidden], #lock[hidden] {
+            display: none;
+        }
 
-    .step-title {
-        font-size: clamp(14px, 1.6vw, 20px);
-        margin: 64px 0 20px;
-    }
-
-    .case p, .case li {
-        font-size: clamp(13px, 1.3vw, 16px);
-        font-weight: 300;
-        line-height: 1.6;
-    }
-
-    .lede { margin-bottom: 32px; }
-
-    .case ul {
-        list-style: none;
-        margin-bottom: 16px;
-    }
-
-    .case li::before {
-        content: '– ';
-        color: var(--accent);
-    }
-
-    /* The options sit side by side, each with its description underneath */
-    .options {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 32px;
-        align-items: start;
-        margin-bottom: 96px;
-    }
-
-    .option-text {
-        margin-top: 24px;
-    }
-
-    .option-text .option-name {
-        font-size: clamp(16px, 2vw, 24px);
-        margin-bottom: 4px;
-    }
-
-    .case .option-time {
-        font-style: italic;
-        margin-bottom: 16px;
-    }
-
-    /* Bezel.png is 450×920 with a transparent 402×874 screen at (24, 23) */
-    .device-column {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .device {
-        position: relative;
-        width: 100%;
-        aspect-ratio: 450 / 920;
-    }
-
-    .device video {
-        position: absolute;
-        left: 5.333%;
-        top: 2.5%;
-        width: 89.333%;
-        height: 95%;
-        object-fit: cover;
-        border-radius: 13% / 6%;
-        background: #f2f2f0;
-    }
-
-    .device .bezel {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-    }
-
-    .option-name {
-        font-size: clamp(13px, 1.3vw, 16px);
-        margin-bottom: 8px;
-    }
-
-    .option-but {
-        font-size: clamp(13px, 1.3vw, 16px);
-        color: var(--accent);
-        margin: 4px 0;
-    }
-
-    .case figure { margin: 0 0 24px; }
-
-    .case figure img {
-        width: 100%;
-        height: auto;
-        display: block;
-    }
-
-    .case figure img.phone {
-        width: auto;
-        max-width: 100%;
-        max-height: 520px;
-        margin: 0 auto;
-    }
-
-    .case figcaption {
-        margin-top: 12px;
-        font-size: clamp(12px, 1.2vw, 15px);
-        color: var(--accent);
-        text-align: center;
-    }
-
-    .pair, .qa {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 32px;
-        align-items: end;
-        margin-top: 40px;
-    }
-
-    @media (max-width: 768px) {
-        .case-header { margin-bottom: 56px; }
-        .case-section { margin-bottom: 72px; }
-        .options { grid-template-columns: 1fr; gap: 64px; margin-bottom: 64px; }
-        .device { max-width: 300px; margin: 0 auto; }
-        .pair, .qa { grid-template-columns: 1fr; gap: 24px; }
-        .case figure img.phone { max-height: 440px; }
-    }
+        @media (max-width: 768px) {
+            body { padding: 80px 20px 40px; }
+        }
     </style>
 </head>
 <body>
@@ -190,163 +86,141 @@
 
     <!-- Navigation Pane -->
     <nav id="nav-pane" aria-label="pages">
-        <a href="ux.html" class="nav-item active" data-key="2" aria-keyshortcuts="2">design</a>
-        <a href="canvas.html" class="nav-item" data-key="3" aria-keyshortcuts="3">art</a>
-        <a href="links.html" class="nav-item" data-key="4" aria-keyshortcuts="4">press</a>
+        <a href="index.html" class="nav-item" data-key="1" aria-label="1: home">1</a>
+        <a href="canvas.html" class="nav-item" data-key="2" aria-label="2: canvas">2</a>
+        <a href="ux.html" class="nav-item active" data-key="3" aria-label="3: ux/ui">3</a>
+        <a href="links.html" class="nav-item" data-key="4" aria-label="4: press and links">4</a>
     </nav>
 
     <!-- Signature -->
-    <div id="signature"><a href="index.html" class="nav-item" data-key="1" aria-label="amanda sun: home" aria-keyshortcuts="1">amanda sun</a></div>
+    <div id="signature">amanda sun</div>
 
     <main id="main" tabindex="-1">
-<div class="case">
-    <header class="case-header">
-        <h1 class="case-title">caltrain</h1>
-    </header>
+    <div id="lock">
+        <form id="lock-form">
+            <label for="password">this project is password protected</label>
+            <input id="password" type="password" autocomplete="current-password" autofocus>
+            <button type="submit">enter →</button>
+            <div id="lock-message" role="status" aria-live="polite"></div>
+        </form>
+    </div>
 
-    <section class="case-section">
-        <h2 class="section-title">the problem</h2>
-        <p class="lede">what time is the next caltrain? today, answering that means one of these:</p>
-
-        <div class="options">
-            <div class="option">
-                <div class="device-column">
-                    <div class="device" data-video-frame>
-                        <video aria-label="screen recording: scrolling and zooming the caltrain pdf timetable" src="imgs/caltrain/option-pdf.mp4" autoplay loop muted playsinline></video>
-                        <img loading="lazy" class="bezel" src="imgs/caltrain/bezel.png" alt="">
-                    </div>
-                </div>
-                <div class="option-text">
-                    <h3 class="option-name">option 1: caltrain pdf</h3>
-                    <p class="option-time">32 seconds</p>
-                    <ul>
-                        <li>requires pinch and zoom</li>
-                        <li>tracking columns</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="option">
-                <div class="device-column">
-                    <div class="device" data-video-frame>
-                        <video aria-label="screen recording: choosing stations on the caltrain website" src="imgs/caltrain/option-site.mp4" autoplay loop muted playsinline></video>
-                        <img loading="lazy" class="bezel" src="imgs/caltrain/bezel.png" alt="">
-                    </div>
-                </div>
-                <div class="option-text">
-                    <h3 class="option-name">option 2: caltrain site</h3>
-                    <p class="option-time">15 seconds</p>
-                    <ul>
-                        <li>re-enter origin and destination</li>
-                        <li>re-enter weekday/weekend</li>
-                        <li>scroll past intermediary stops</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="option">
-                <div class="device-column">
-                    <div class="device" data-video-frame>
-                        <video aria-label="screen recording: looking up the next train in google maps" src="imgs/caltrain/option-maps.mp4" autoplay loop muted playsinline></video>
-                        <img loading="lazy" class="bezel" src="imgs/caltrain/bezel.png" alt="">
-                    </div>
-                </div>
-                <div class="option-text">
-                    <h3 class="option-name">option 3: google maps</h3>
-                    <p class="option-time">20 seconds</p>
-                    <ul>
-                        <li>requires pinch and zoom</li>
-                        <li>tracking columns</li>
-                    </ul>
-                    <div class="option-but">but</div>
-                    <ul>
-                        <li>can see how far you are from station</li>
-                        <li>routes you to the closest station</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <h3 class="option-name">option 4: other apps</h3>
-        <ul>
-            <li>the goods: greys out past trains</li>
-        </ul>
-    </section>
-
-    <section class="case-section">
-        <h2 class="section-title">intention</h2>
-        <ul>
-            <li>user: the daily commuter</li>
-            <li>no taps: integrated in os</li>
-            <li>simple</li>
-        </ul>
-    </section>
-
-    <section class="case-section">
-        <h2 class="section-title">version 1</h2>
-        <figure><img loading="lazy" src="imgs/caltrain/v1-screens.webp" alt="version 1 screens"></figure>
-
-        <h3 class="step-title">onboarding</h3>
-        <figure><img loading="lazy" src="imgs/caltrain/onboarding.webp" alt="onboarding flow"></figure>
-
-        <div class="pair">
-            <figure>
-                <img loading="lazy" src="imgs/caltrain/onboarding-toggle.webp" alt="onboarding with toggles">
-                <figcaption>toggle</figcaption>
-            </figure>
-            <figure>
-                <img loading="lazy" src="imgs/caltrain/onboarding-visual.webp" alt="onboarding with a map">
-                <figcaption>visual</figcaption>
-            </figure>
-        </div>
-
-        <div class="pair">
-            <figure>
-                <img loading="lazy" class="phone" src="imgs/caltrain/contextual-default.webp" alt="onboarding with location prompt">
-                <figcaption>contextual default</figcaption>
-            </figure>
-            <figure>
-                <img loading="lazy" class="phone" src="imgs/caltrain/more-contextual.webp" alt="weekend times with past trains greyed out">
-                <figcaption>more contextual default</figcaption>
-            </figure>
-        </div>
-        <ul>
-            <li>weekend/weekday</li>
-            <li>grey out past trains</li>
-            <li>anchor to next departing train</li>
-        </ul>
-    </section>
-
-    <section class="case-section">
-        <h2 class="section-title">version 2</h2>
-        <figure><img loading="lazy" src="imgs/caltrain/v2-screens.webp" alt="version 2 screens"></figure>
-
-        <h3 class="step-title">progressive disclosure</h3>
-        <div class="qa">
-            <figure>
-                <img loading="lazy" class="phone" src="imgs/caltrain/pd-limited.webp" alt="schedule with local, limited and express filter buttons">
-                <figcaption>do we need the limited buttons?</figcaption>
-            </figure>
-            <figure>
-                <img loading="lazy" src="imgs/caltrain/pd-limited-no.webp" alt="filters moved into a popover">
-                <figcaption>not really.</figcaption>
-            </figure>
-        </div>
-        <div class="qa">
-            <figure>
-                <img loading="lazy" src="imgs/caltrain/pd-toggle.webp" alt="schedule with and without the weekday/weekend toggle">
-                <figcaption>and the weekday/weekend toggle?</figcaption>
-            </figure>
-            <figure>
-                <img loading="lazy" class="phone" src="imgs/caltrain/pd-nah.webp" alt="schedule without the toggle">
-                <figcaption>nah.</figcaption>
-            </figure>
-        </div>
-    </section>
-
-    <section class="case-section">
-        <h2 class="section-title">version 3</h2>
-        <figure><img loading="lazy" src="imgs/caltrain/v3-screens.webp" alt="version 3 screens"></figure>
-    </section>
-</div>
+    <div id="content" hidden></div>
     </main>
+
+    <script>
+        // Generated by tools/encrypt.py — do not edit by hand.
+        const ENC = {"salt":"NP9+LciK/+pd9v9V90n8hQ==","iterations":600000,"iv":"3lUvhR/eiaeZ0ZSt","ct":"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"};
+
+        const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+        const storageKey = 'unlock:' + ENC.salt;
+
+        async function deriveKey(password) {
+            const base = await crypto.subtle.importKey(
+                'raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']);
+            return crypto.subtle.deriveKey(
+                { name: 'PBKDF2', salt: b64(ENC.salt), iterations: ENC.iterations, hash: 'SHA-256' },
+                base, { name: 'AES-GCM', length: 256 }, true, ['decrypt']);
+        }
+
+        async function decrypt(key, iv, data) {
+            return crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data);
+        }
+
+        // Media is stored as encrypted base64 in .js files, loaded with script tags
+        // so it also works when the page is opened straight from disk (file://)
+        const mediaWaiting = {};
+        window.__lockedMedia = (id, data) => mediaWaiting[id] && mediaWaiting[id](data);
+
+        function fetchMedia(entry) {
+            return new Promise((resolve, reject) => {
+                mediaWaiting[entry.id] = resolve;
+                const script = document.createElement('script');
+                script.src = entry.file;
+                script.onerror = reject;
+                document.body.appendChild(script);
+            });
+        }
+
+        // One load per file, shared by every element that uses it
+        const mediaUrls = {};
+        function loadMedia(key, entry) {
+            mediaUrls[entry.id] = mediaUrls[entry.id] || (async () => {
+                const buf = b64(await fetchMedia(entry));
+                const plain = await decrypt(key, buf.slice(0, 12), buf.slice(12));
+                return URL.createObjectURL(new Blob([plain], { type: entry.type }));
+            })();
+            return mediaUrls[entry.id];
+        }
+
+        async function unlock(key) {
+            const plain = await decrypt(key, b64(ENC.iv), b64(ENC.ct));
+            const payload = JSON.parse(new TextDecoder().decode(plain));
+
+            const content = document.getElementById('content');
+            content.innerHTML = payload.html;
+            document.getElementById('lock').hidden = true;
+            content.hidden = false;
+
+            const show = async el => {
+                const entry = payload.media[el.dataset.src];
+                if (!entry) return;
+                try {
+                    el.src = await loadMedia(key, entry);
+                    if (el.tagName === 'VIDEO' && el.autoplay) el.play().catch(() => {});
+                } catch (err) {
+                    console.error('could not load', el.dataset.src, err);
+                }
+            };
+
+            // Videos are heavy: load each one only as it scrolls near the screen
+            const nearScreen = new IntersectionObserver(entries => {
+                entries.forEach(e => {
+                    if (!e.isIntersecting) return;
+                    nearScreen.unobserve(e.target);
+                    show(e.target);
+                });
+            }, { rootMargin: '100% 0px' });
+
+            content.querySelectorAll('[data-src]').forEach(el => {
+                if (el.tagName === 'VIDEO') nearScreen.observe(el);
+                else show(el);
+            });
+
+            const addPauseButtons = () => window.addPauseButtons(content);
+            window.addPauseButtons ? addPauseButtons() : document.addEventListener('DOMContentLoaded', addPauseButtons);
+        }
+
+        // Stay unlocked for the rest of the browser session
+        (async () => {
+            try {
+                const saved = sessionStorage.getItem(storageKey);
+                if (!saved) return;
+                const key = await crypto.subtle.importKey(
+                    'raw', b64(saved), 'AES-GCM', true, ['decrypt']);
+                await unlock(key);
+            } catch (e) {}
+        })();
+
+        document.getElementById('lock-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('password');
+            const message = document.getElementById('lock-message');
+            message.textContent = '';
+            try {
+                const key = await deriveKey(input.value);
+                await unlock(key);
+                document.getElementById('main').focus();
+                try {
+                    const raw = new Uint8Array(await crypto.subtle.exportKey('raw', key));
+                    sessionStorage.setItem(storageKey, btoa(String.fromCharCode(...raw)));
+                } catch (e) {}
+            } catch (err) {
+                message.textContent = 'wrong password';
+                input.select();
+            }
+        });
+
+    </script>
 </body>
 </html>
