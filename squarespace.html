@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>block duplication — amanda sun</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="site.js" defer></script>
+    <style>
+        :root {
+            --editor-blue: #2f6feb;
+        }
+
+        body {
+            overflow-x: clip;
+            padding: 100px 40px 60px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        h1, h2, h3 {
+            font-weight: var(--weight-regular);
+        }
+
+        section {
+            margin-bottom: 64px;
+        }
+
+        /* Hero: date line, title and next link, then the project details */
+        .hero {
+            margin-bottom: 64px;
+        }
+
+        /* Company and title on the left, project links on the right */
+        .hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 24px;
+        }
+
+        .dateline,
+        .project-links {
+            font-size: clamp(14px, 1.8vw, 22px);
+        }
+
+        .dateline {
+            margin-bottom: 4px;
+        }
+
+        /* Columns keep the word "project" lined up across both links */
+        .project-links {
+            display: grid;
+            grid-template-columns: auto auto auto;
+            column-gap: 0.3em;
+            row-gap: 4px;
+            flex-shrink: 0;
+
+            & a {
+                display: grid;
+                grid-template-columns: subgrid;
+                grid-column: 1 / -1;
+            }
+
+            & .link-start {
+                justify-self: end;
+            }
+        }
+
+        .hero h1 {
+            font-size: clamp(32px, 6vw, 66px);
+            line-height: 1.1;
+            text-wrap: balance;
+            margin-bottom: 12px;
+        }
+
+        /* Stacked "Label: value" lines */
+        .details {
+            margin: 24px 0 56px;
+            font-size: clamp(13px, 1.4vw, 18px);
+            line-height: 1.3;
+            color: var(--accent);
+
+            & dt,
+            & dd {
+                display: inline;
+            }
+        }
+
+        .prose {
+            max-width: 60ch;
+
+            & h2 {
+                font-size: clamp(20px, 2.6vw, 32px);
+                margin-bottom: 20px;
+            }
+
+            & h3 {
+                font-size: clamp(16px, 2vw, 24px);
+                margin: 40px 0 12px;
+            }
+
+            & p {
+                font-size: clamp(13px, 1.4vw, 18px);
+                font-weight: 300;
+                line-height: 1.6;
+                text-wrap: pretty;
+            }
+
+            & p + p {
+                margin-top: 16px;
+            }
+        }
+
+        .quote {
+            margin-bottom: 24px;
+            font-size: clamp(16px, 2vw, 24px);
+            font-style: italic;
+            line-height: 1.35;
+            text-wrap: pretty;
+        }
+
+        /* Examples of blocks: images fit a same-sized frame so captions line up */
+        .block-examples {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-top: 32px;
+
+            & figcaption {
+                margin-bottom: 12px;
+                text-align: center;
+                font-size: var(--size-small);
+                color: var(--accent);
+            }
+        }
+
+        .example-frame {
+            position: relative;
+            aspect-ratio: 4 / 3;
+
+            & img {
+                position: absolute;
+                inset: 0;
+                margin: auto;
+                max-width: 100%;
+                max-height: 100%;
+                border-radius: 10px;
+            }
+        }
+
+        /* Opening: "These are all blocks" gives way to "They can be duplicated"
+           while a copy of each photo slides out of its original, selected like
+           a new copy in the editor */
+        .blocks {
+            --shift: clamp(14px, 2.2vw, 28px);
+            position: relative;
+            height: clamp(420px, 55vw, 640px);
+            isolation: isolate;
+            display: grid;
+            place-items: center;
+        }
+
+        .blocks-text {
+            display: grid;
+            position: relative;
+            z-index: 1;
+            font-size: clamp(28px, 5vw, 60px);
+            line-height: 1.25;
+            text-align: center;
+
+            & span {
+                display: block;
+            }
+        }
+
+        .line {
+            grid-area: 1 / 1;
+            transition: opacity 0.5s ease, translate 0.5s ease;
+
+            &.after {
+                opacity: 0;
+                translate: 0 12px;
+            }
+        }
+
+        .blocks.duplicated .line {
+            opacity: 0;
+            translate: 0 -12px;
+
+            &.after {
+                opacity: 1;
+                translate: 0 0;
+            }
+        }
+
+        .block-photo {
+            position: absolute;
+            border-radius: 10px;
+            width: clamp(90px, 14vw, 180px);
+            aspect-ratio: 3 / 4;
+            object-fit: cover;
+            left: var(--x);
+            top: var(--y);
+        }
+
+        .block-photo.copy {
+            opacity: 0;
+            outline: 2px solid transparent;
+        }
+
+        .blocks.duplicated .block-photo.copy {
+            animation: duplicate-block 1.2s ease both;
+            animation-delay: calc(var(--i) * 180ms + 200ms);
+        }
+
+        @keyframes duplicate-block {
+            0% {
+                opacity: 0;
+                translate: 0 0;
+                outline-color: var(--editor-blue);
+            }
+            15% {
+                opacity: 1;
+            }
+            55%, 80% {
+                opacity: 1;
+                translate: var(--shift) var(--shift);
+                outline-color: var(--editor-blue);
+            }
+            100% {
+                opacity: 1;
+                translate: var(--shift) var(--shift);
+                outline-color: transparent;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .blocks.duplicated .block-photo.copy {
+                animation-delay: 0ms;
+            }
+        }
+
+        /* Edge case tutorial: arrows step through the cases, and each one sets
+           up the sandbox. The sandbox is in design units (--u is one unit in
+           px, so everything scales with the stage's width) */
+        /* Reset and arrows sit in the sandbox's top right, over any blocks */
+        .sandbox-controls {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            z-index: 21;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: var(--size-small);
+            font-variant-numeric: tabular-nums;
+            color: var(--ink);
+
+            & button {
+                padding: 4px;
+                font-family: var(--font);
+                font-size: inherit;
+                line-height: 1;
+                color: var(--ink);
+                background: none;
+                border: none;
+                cursor: pointer;
+                transition: var(--weight-transition);
+
+                &:hover {
+                    font-weight: var(--weight-hover);
+                }
+
+                &[aria-pressed="true"] {
+                    font-weight: var(--weight-hover);
+                    text-decoration: underline;
+                }
+            }
+
+            & .arrow {
+                font-size: clamp(18px, 2vw, 24px);
+            }
+        }
+
+        .step-copy {
+            margin-bottom: 24px;
+            min-height: 104px; /* room for two lines, so the sandbox stays put */
+
+            & h3 {
+                margin-top: 24px;
+            }
+        }
+
+        .stage {
+            position: relative;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Rounds the sections only, so blocks and the toolbar never get clipped */
+        .bands {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+
+        .band {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            background-color: #afc0ce;
+
+            &.second {
+                background-color: #c5d2dc;
+            }
+        }
+
+        .band-name {
+            position: absolute;
+            left: 16px;
+            top: 8px;
+            font-size: var(--size-small);
+        }
+
+        .stage:not(.two-sections) .band-name {
+            display: none;
+        }
+
+        /* The grid shows up while dragging */
+        .stage.dragging .band {
+            background-image:
+                linear-gradient(to right, rgb(255 255 255 / 0.35) 1px, transparent 1px),
+                linear-gradient(to bottom, rgb(255 255 255 / 0.35) 1px, transparent 1px);
+            background-size: calc(var(--u) * 24) calc(var(--u) * 24);
+        }
+
+        .block {
+            position: absolute;
+            border-radius: 10px;
+            cursor: grab;
+            touch-action: pan-y;
+            display: flex;
+            align-items: center;
+
+            &:hover:not(.selected) {
+                outline: 2px solid var(--editor-blue);
+
+                &::before {
+                    content: attr(data-type);
+                    position: absolute;
+                    left: -2px;
+                    bottom: 100%;
+                    padding: 1px 5px;
+                    font-size: 10px;
+                    letter-spacing: 0.06em;
+                    text-transform: uppercase;
+                    color: white;
+                    background: var(--editor-blue);
+                    white-space: nowrap;
+                }
+            }
+
+            &.selected {
+                touch-action: none;
+            }
+
+            &.arriving {
+                transition: left 0.2s ease, top 0.2s ease;
+            }
+
+            & img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+                border-radius: inherit;
+                pointer-events: none;
+            }
+        }
+
+        .stage.dragging .block.selected {
+            cursor: grabbing;
+            box-shadow: 0 8px 24px rgb(0 0 0 / 0.3);
+        }
+
+        .block-locked {
+            justify-content: center;
+            text-align: center;
+            font-size: calc(var(--u) * 18);
+            line-height: 1.2;
+            padding: 0 calc(var(--u) * 12);
+            background: rgb(255 255 255 / 0.55);
+            border: 1px dashed var(--ink);
+        }
+
+        .selection {
+            position: absolute;
+            z-index: 19;
+            pointer-events: none;
+            outline: 2px solid var(--editor-blue);
+
+            & span {
+                position: absolute;
+                width: 10px;
+                height: 10px;
+                margin: -5px;
+                background: white;
+                border: 2px solid var(--editor-blue);
+                border-radius: 2px;
+            }
+
+            &.multi span {
+                display: none;
+            }
+        }
+
+        /* Floating toolbar and tooltip, matching the Squarespace editor */
+        .toolbar {
+            position: absolute;
+            z-index: 20;
+            display: flex;
+            gap: 8px;
+            padding: 4px 8px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgb(0 0 0 / 0.14);
+
+            &[hidden] {
+                display: none;
+            }
+
+            & button {
+                position: relative;
+                display: grid;
+                place-items: center;
+                width: 36px;
+                height: 36px;
+                color: #111;
+                background: none;
+                border: none;
+                border-radius: 3px;
+                cursor: pointer;
+
+                &:hover {
+                    background: #e6e6e6;
+                }
+
+                &.danger {
+                    color: #c8444b;
+                }
+
+                &[aria-disabled="true"] {
+                    color: #b5b5b5;
+                    cursor: not-allowed;
+
+                    &:hover {
+                        background: none;
+                    }
+                }
+
+                &:hover .tip,
+                &:focus-visible .tip {
+                    display: flex;
+                }
+            }
+
+            & svg {
+                width: 22px;
+                height: 22px;
+                fill: none;
+                stroke: currentColor;
+                stroke-width: 2;
+                stroke-linecap: butt;
+                stroke-linejoin: miter;
+            }
+        }
+
+        .tip {
+            display: none;
+            align-items: center;
+            gap: 4px;
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 50%;
+            translate: -50% 0;
+            padding: 10px 16px;
+            font-family: var(--font);
+            font-size: 14px;
+            color: white;
+            background: #111;
+            border-radius: 4px;
+            white-space: nowrap;
+            pointer-events: none;
+
+            & kbd {
+                display: grid;
+                place-items: center;
+                min-width: 23px;
+                height: 22px;
+                padding: 0 5px;
+                font-family: inherit;
+                font-size: 12px;
+                font-weight: 500;
+                background: #4a4a4a;
+                border-radius: 3px;
+
+                &:first-of-type {
+                    margin-left: 8px;
+                }
+            }
+        }
+
+        #sandbox-status {
+            margin-top: 16px;
+            font-size: var(--size-body);
+            line-height: 1.4;
+            min-height: 2.8em;
+            text-wrap: pretty;
+        }
+
+        /* Touch has no shift key, so it gets a button for selecting several */
+        #select-several {
+            display: none;
+
+            @media (hover: none) and (pointer: coarse) {
+                display: inline-block;
+            }
+        }
+
+        /* The final product: two recordings that play while hovered */
+        .final {
+            & h2 {
+                font-size: clamp(20px, 2.6vw, 32px);
+                margin-bottom: 20px;
+            }
+        }
+
+        .final-note {
+            margin-bottom: 32px;
+            font-size: clamp(13px, 1.4vw, 18px);
+            font-weight: 300;
+            line-height: 1.6;
+
+            & a {
+                text-decoration: underline;
+                text-underline-offset: 3px;
+            }
+        }
+
+        .final-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+
+            & video {
+                width: 100%;
+                height: auto;
+                display: block;
+                border-radius: 10px;
+                -webkit-tap-highlight-color: transparent;
+            }
+        }
+
+        /* Shows what a click does: play while stopped, pause while playing */
+        .clip {
+            position: relative;
+        }
+
+        .state-icon {
+            position: absolute;
+            right: 14px;
+            bottom: 14px;
+            width: 22px;
+            height: 22px;
+            fill: var(--ink);
+            pointer-events: none;
+        }
+
+        .pause-shape,
+        .clip.playing .play-shape {
+            display: none;
+        }
+
+        .clip.playing .pause-shape {
+            display: block;
+        }
+
+        .outcome {
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 80px 20px 40px; }
+            section { margin-bottom: 48px; }
+            .hero { margin-bottom: 48px; }
+            .details { margin: 20px 0 40px; }
+            .step-copy { min-height: 124px; }
+            .blocks { height: 360px; }
+            .block-photo { width: 80px; }
+            .final-grid { grid-template-columns: 1fr; }
+            .block-examples { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <a class="skip-link" href="#main">skip to content</a>
+
+    <!-- Navigation Pane -->
+    <nav id="nav-pane" aria-label="pages">
+        <a href="index.html" class="nav-item" data-key="1" aria-label="1: home">1</a>
+        <a href="canvas.html" class="nav-item" data-key="2" aria-label="2: canvas">2</a>
+        <a href="ux.html" class="nav-item active" data-key="3" aria-label="3: ux/ui">3</a>
+        <a href="links.html" class="nav-item" data-key="4" aria-label="4: press and links">4</a>
+    </nav>
+
+    <!-- Signature -->
+    <div id="signature">amanda sun</div>
+
+    <main id="main" class="container" tabindex="-1">
+        <section class="blocks" id="blocks">
+            <p class="visually-hidden">These are all blocks. They can be duplicated.</p>
+            <div class="blocks-text" aria-hidden="true">
+                <p class="line"><span>↑ These are all →</span><span>← Blocks ↓</span></p>
+                <p class="line after"><span>↑ They can be →</span><span>← duplicated ↓</span></p>
+            </div>
+            <img class="block-photo" style="--x: 8%; --y: 4%" src="imgs/squarespace/block-1.jpg" alt="">
+            <img class="block-photo copy" style="--x: 8%; --y: 4%; --i: 0" src="imgs/squarespace/block-1.jpg" alt="">
+            <img class="block-photo" style="--x: 78%; --y: 10%" src="imgs/squarespace/block-2.jpg" alt="">
+            <img class="block-photo copy" style="--x: 78%; --y: 10%; --i: 1" src="imgs/squarespace/block-2.jpg" alt="">
+            <img class="block-photo" style="--x: 2%; --y: 58%" src="imgs/squarespace/block-3.jpg" alt="">
+            <img class="block-photo copy" style="--x: 2%; --y: 58%; --i: 2" src="imgs/squarespace/block-3.jpg" alt="">
+            <img class="block-photo" style="--x: 64%; --y: 66%" src="imgs/squarespace/block-4.jpg" alt="">
+            <img class="block-photo copy" style="--x: 64%; --y: 66%; --i: 3" src="imgs/squarespace/block-4.jpg" alt="">
+        </section>
+
+        <header class="hero">
+            <div class="hero-top">
+                <div>
+                    <p class="dateline">Squarespace</p>
+                    <h1>Block Duplication</h1>
+                </div>
+                <div class="project-links">
+                    <a class="text-link" href="billington.html"><span class="link-start">next</span> <span>project</span> <span>→</span></a>
+                    <a class="text-link" href="caltrain.html"><span class="link-start">← previous</span> <span>project</span></a>
+                </div>
+            </div>
+            <dl class="details">
+                <div>
+                    <dt>Time:</dt>
+                    <dd>Summer 2022</dd>
+                </div>
+                <div>
+                    <dt>Role:</dt>
+                    <dd>Design handoff, API</dd>
+                </div>
+                <div>
+                    <dt>Partners:</dt>
+                    <dd>Carrie Lin</dd>
+                </div>
+            </dl>
+            <div class="prose">
+                <h2>Overview</h2>
+                <p>Editing is at the heart of the Squarespace customer experience. However, a native copy-paste feature doesn't exist. Our team tackled this under a project called Block Duplication.</p>
+                <p>I produced the duplication API, and was heavily involved in the design handoff. Illustrated below in the sandbox are the edge cases I brought up during this process.</p>
+            </div>
+        </header>
+
+
+        <section class="prose">
+            <h2>Inspiration</h2>
+            <blockquote class="quote">“I spent half an hour setting up this menu, and now I need to redo it for every page.”</blockquote>
+            <p>Without copy-paste, customers had to go back in and recreate each asset from scratch. Duplication would give them a native, intuitive way to build their websites.</p>
+        </section>
+        
+        <section>
+            <div class="prose">
+                <h2>What is a block?</h2>
+                <p>A block defines any item on a website — from a piece of text or image, to something more complicated, like an accordion, audio file, product, or menu. </p>
+            </div>
+            <div class="block-examples">
+                <figure>
+                    <figcaption>Accordion</figcaption>
+                    <div class="example-frame"><img src="imgs/squarespace/examples/accordion.png" alt="an accordion block with onboarding, action and exit rows"></div>
+                </figure>
+                <figure>
+                    <figcaption>Audio</figcaption>
+                    <div class="example-frame"><img src="imgs/squarespace/examples/audio.png" alt="an audio block playing Honeybee by Olivia Rodrigo"></div>
+                </figure>
+                <figure>
+                    <figcaption>Product</figcaption>
+                    <div class="example-frame"><img src="imgs/squarespace/examples/product.png" alt="a product block for a Salon Emmeline gift card, from $25.00"></div>
+                </figure>
+                <figure>
+                    <figcaption>Menu</figcaption>
+                    <div class="example-frame"><img src="imgs/squarespace/examples/menu.png" alt="a menu block showing a sandwiches section"></div>
+                </figure>
+            </div>
+        </section>
+
+        <section>
+            <div class="prose">
+                <h2>Edge Cases</h2>
+            </div>
+            <div class="prose step-copy" aria-live="polite">
+                <h3 id="step-title"></h3>
+                <p id="step-text"></p>
+            </div>
+            <div class="stage" id="stage" role="group" aria-label="block duplication sandbox" tabindex="-1">
+                <div class="bands">
+                    <div class="band"><span class="band-name">section 1</span></div>
+                    <div class="band second" id="second-band" hidden><span class="band-name">section 2</span></div>
+                </div>
+                <div class="sandbox-controls">
+                    <button type="button" id="select-several" aria-pressed="false">select several</button>
+                    <button type="button" id="sandbox-reset">reset</button>
+                    <button type="button" class="arrow" id="step-previous" aria-label="previous edge case">←</button>
+                    <span id="step-count"></span>
+                    <button type="button" class="arrow" id="step-next" aria-label="next edge case">→</button>
+                </div>
+                <div class="selection" id="selection" hidden>
+                    <span style="left: 0; top: 0"></span>
+                    <span style="left: 50%; top: 0"></span>
+                    <span style="left: 100%; top: 0"></span>
+                    <span style="left: 0; top: 50%"></span>
+                    <span style="left: 100%; top: 50%"></span>
+                    <span style="left: 0; top: 100%"></span>
+                    <span style="left: 50%; top: 100%"></span>
+                    <span style="left: 100%; top: 100%"></span>
+                </div>
+                <div class="toolbar" id="toolbar" role="toolbar" aria-label="block actions" hidden>
+                    <button type="button" id="duplicate-button" aria-label="duplicate">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8h13v13H8z"/><path d="M16 8V3H3v13h5"/></svg>
+                        <span class="tip" id="duplicate-tip"></span>
+                    </button>
+                    <button type="button" id="delete-button" class="danger" aria-label="delete">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V3h8v3M5 6v15h14V6M10 10v7M14 10v7"/></svg>
+                    </button>
+                </div>
+            </div>
+            <p id="sandbox-status" role="status"></p>
+        </section>
+
+        <section class="final">
+            <h2>The Final Product</h2>
+            <p class="final-note">Find more info <a class="text-link" href="https://support.squarespace.com/hc/en-us/articles/206543627-Duplicating-pages-and-content?platform=v6&amp;websiteId=630695821979201073ae342a#h_01HKNG2V56WXTRTGVTQSS005YH" target="_blank">here<span class="visually-hidden"> (opens in a new tab)</span></a>.</p>
+            <div class="final-grid">
+                <div class="clip">
+                    <video src="imgs/squarespace/duplication.mp4" poster="imgs/squarespace/duplication-poster.jpg"
+                           loop muted playsinline preload="metadata" tabindex="0" data-no-pause-button data-hover-play
+                           aria-label="duplicating an image block in the squarespace editor"></video>
+                    <svg class="state-icon" viewBox="0 0 24 24" aria-hidden="true"><path class="pause-shape" d="M7 4h4v16H7zM13 4h4v16h-4z"/><path class="play-shape" d="M7 4l13 8-13 8z"/></svg>
+                </div>
+                <div class="clip">
+                    <video src="imgs/squarespace/multiselect.mp4" poster="imgs/squarespace/multiselect-poster.jpg"
+                           loop muted playsinline preload="metadata" tabindex="0" data-no-pause-button data-hover-play
+                           aria-label="selecting several text blocks and duplicating them together"></video>
+                    <svg class="state-icon" viewBox="0 0 24 24" aria-hidden="true"><path class="pause-shape" d="M7 4h4v16H7zM13 4h4v16h-4z"/><path class="play-shape" d="M7 4l13 8-13 8z"/></svg>
+                </div>
+            </div>
+        </section>
+
+        <section class="prose outcome">
+            <h2>Outcome</h2>
+            <p>Block Duplication shipped to 3.8 million Squarespace users!</p>
+            <p>This work also set the team up for section duplication, which is now also available for users.</p>
+        </section>
+    </main>
+
+    <script>
+        // Opening: hold on "These are all blocks", then duplicate. Waits until
+        // the page is actually being viewed, since hovering a link prerenders it.
+        (() => {
+            const HOLD = 1800;
+            const blocks = document.getElementById('blocks');
+            const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const play = () => setTimeout(() => blocks.classList.add('duplicated'), reduceMotion ? 0 : HOLD);
+
+            if (document.prerendering) {
+                document.addEventListener('prerenderingchange', play, { once: true });
+            } else {
+                play();
+            }
+        })();
+
+        // Final product videos stay paused until hovered or keyboard focused. On
+        // touch, tapping plays and pauses them (site.js handles clicks). Either
+        // way, they stop once they scroll off screen.
+        const offScreen = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (!entry.isIntersecting) entry.target.pause();
+            });
+        });
+
+        document.querySelectorAll('[data-hover-play]').forEach((video) => {
+            const play = () => video.play().catch(() => {});
+            const clip = video.closest('.clip');
+            video.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') play(); });
+            video.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') video.pause(); });
+            video.addEventListener('focus', () => { if (video.matches(':focus-visible')) play(); });
+            video.addEventListener('blur', () => video.pause());
+            video.addEventListener('play', () => clip.classList.add('playing'));
+            video.addEventListener('pause', () => clip.classList.remove('playing'));
+            offScreen.observe(video);
+        });
+
+        // Sandbox: a small recreation of block duplication in the editor.
+        // Positions are in design units, with y relative to the block's section.
+        (() => {
+            const GRID = 24;
+            const OFFSET = 24;
+            const IMGS = 'imgs/squarespace/';
+
+            const stage = document.getElementById('stage');
+            const selectionBox = document.getElementById('selection');
+            const toolbar = document.getElementById('toolbar');
+            const duplicateButton = document.getElementById('duplicate-button');
+            const duplicateTip = document.getElementById('duplicate-tip');
+            const deleteButton = document.getElementById('delete-button');
+            const secondBand = document.getElementById('second-band');
+            const statusLine = document.getElementById('sandbox-status');
+            const selectSeveral = document.getElementById('select-several');
+
+            const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
+            const shortcut = [isMac ? '⌘' : 'Ctrl', 'D'];
+            const narrow = matchMedia('(max-width: 768px)');
+
+            const NOT_COPYABLE = 'This block can’t be duplicated, so duplicate is disabled.';
+            const ACROSS_SECTIONS = 'Blocks in different sections can’t be selected together.';
+
+            // Each edge case sets up the sandbox, with its blocks already selected
+            const steps = [
+                {
+                    title: 'Copying on the left side',
+                    text: 'On the left side of a site, a copy lands offset to the bottom right of the original.',
+                    hint: 'Press duplicate to see where the copy lands. You can drag the photo, too.',
+                    sections: 1,
+                    wide: [{ type: 'image', section: 0, x: 120, y: 120, w: 144, h: 192, src: 'block-1.jpg' }],
+                    narrow: [{ type: 'image', section: 0, x: 48, y: 168, w: 132, h: 176, src: 'block-1.jpg' }],
+                },
+                {
+                    title: 'Copying on the right side',
+                    text: 'At the right edge of a site, that offset made copying difficult, so we changed it: the copy goes straight down.',
+                    hint: 'Press duplicate to see where the copy lands.',
+                    sections: 1,
+                    wide: [{ type: 'image', section: 0, x: 840, y: 120, w: 144, h: 192, src: 'block-1.jpg' }],
+                    narrow: [{ type: 'image', section: 0, x: 408, y: 168, w: 132, h: 176, src: 'block-1.jpg' }],
+                },
+                {
+                    title: 'Copying at the bottom right',
+                    text: 'At the bottom right of a section, the copy goes straight down, and the section gets slightly taller to fit it.',
+                    hint: 'Press duplicate to see the section grow.',
+                    sections: 1,
+                    wide: [{ type: 'image', section: 0, x: 840, y: 288, w: 144, h: 192, src: 'block-1.jpg' }],
+                    narrow: [{ type: 'image', section: 0, x: 408, y: 344, w: 132, h: 176, src: 'block-1.jpg' }],
+                },
+                {
+                    title: 'Copying at the bottom left',
+                    text: 'At the bottom left of a section, the copy goes to the bottom right, and the section gets slightly taller here too.',
+                    hint: 'Press duplicate to see the section grow.',
+                    sections: 1,
+                    wide: [{ type: 'image', section: 0, x: 120, y: 288, w: 144, h: 192, src: 'block-1.jpg' }],
+                    narrow: [{ type: 'image', section: 0, x: 48, y: 344, w: 132, h: 176, src: 'block-1.jpg' }],
+                },
+                {
+                    title: 'Copying between sections',
+                    text: 'Users can’t copy between sections, and can’t even select blocks across both. We decided sections were big enough that this was clear.',
+                    hint: 'Try adding the photo in section 2 to this selection. It won’t join.',
+                    sections: 2,
+                    selectFirstOnly: true,
+                    wide: [
+                        { type: 'image', section: 0, x: 444, y: 72, w: 108, h: 144, src: 'block-1.jpg' },
+                        { type: 'image', section: 1, x: 444, y: 48, w: 108, h: 144, src: 'block-4.jpg' },
+                    ],
+                    narrow: [
+                        { type: 'image', section: 0, x: 216, y: 96, w: 108, h: 144, src: 'block-1.jpg' },
+                        { type: 'image', section: 1, x: 216, y: 48, w: 108, h: 144, src: 'block-4.jpg' },
+                    ],
+                },
+                {
+                    title: 'Selecting something that isn’t copyable',
+                    text: 'Duplicating is disabled here too, including in multiselect.',
+                    hint: 'This selection includes a block that can’t be copied, so duplicate is disabled.',
+                    sections: 1,
+                    wide: [
+                        { type: 'image', section: 0, x: 240, y: 144, w: 144, h: 192, src: 'block-1.jpg' },
+                        { type: 'locked', section: 0, x: 552, y: 192, w: 192, h: 96, text: 'not copyable' },
+                    ],
+                    narrow: [
+                        { type: 'image', section: 0, x: 48, y: 168, w: 132, h: 176, src: 'block-1.jpg' },
+                        { type: 'locked', section: 0, x: 288, y: 208, w: 216, h: 96, text: 'not copyable' },
+                    ],
+                },
+            ];
+            const SIZES = { wide: { W: 1000, height: 480 }, narrow: { W: 560, height: 520 } };
+
+            let W, T; // stage width and height
+            let heights = []; // each section's height, which duplicating can grow
+            let stepIndex = 0;
+            let blocks = [];
+            const selected = new Set();
+            let drag = null;
+
+            const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+            const say = (message) => { statusLine.textContent = message; };
+
+            const sectionTop = (section) => heights.slice(0, section).reduce((sum, h) => sum + h, 0);
+
+            const place = (block) => {
+                const { style } = block.el;
+                style.left = `${block.x / W * 100}%`;
+                style.top = `${(block.y + sectionTop(block.section)) / T * 100}%`;
+                style.width = `${block.w / W * 100}%`;
+                style.height = `${block.h / T * 100}%`;
+            };
+
+            // Sizes the stage and sections to match heights
+            const layOut = () => {
+                T = heights.reduce((sum, h) => sum + h, 0);
+                stage.style.aspectRatio = `${W} / ${T}`;
+                stage.querySelectorAll('.band').forEach((band, i) => {
+                    if (i >= heights.length) return;
+                    band.style.top = `${sectionTop(i) / T * 100}%`;
+                    band.style.height = `${heights[i] / T * 100}%`;
+                });
+                blocks.forEach(place);
+            };
+
+            const addBlock = (def) => {
+                const block = { ...def };
+                const el = document.createElement('div');
+                el.className = `block block-${def.type}`;
+                el.tabIndex = 0;
+                el.setAttribute('role', 'button');
+                el.setAttribute('aria-pressed', 'false');
+                el.setAttribute('aria-label', `${def.type === 'locked' ? 'not copyable' : def.type} block, section ${def.section + 1}`);
+                el.dataset.type = def.type;
+                if (def.src) {
+                    const img = document.createElement('img');
+                    img.src = IMGS + def.src;
+                    img.alt = '';
+                    img.draggable = false;
+                    el.append(img);
+                } else {
+                    el.textContent = def.text;
+                }
+                block.el = el;
+                el.block = block;
+                stage.insertBefore(el, selectionBox); // keeps the toolbar last in tab order
+                blocks.push(block);
+                place(block);
+                return block;
+            };
+
+            const bounds = (list) => {
+                const x = Math.min(...list.map(b => b.x));
+                const right = Math.max(...list.map(b => b.x + b.w));
+                const top = (b) => b.y + sectionTop(b.section);
+                const y = Math.min(...list.map(top));
+                const bottom = Math.max(...list.map(b => top(b) + b.h));
+                return { x, y, w: right - x, h: bottom - y };
+            };
+
+            const whyDisabled = () => ([...selected].some(b => b.type === 'locked') ? NOT_COPYABLE : null);
+
+            const render = () => {
+                blocks.forEach((b) => {
+                    const isSelected = selected.has(b);
+                    b.el.classList.toggle('selected', isSelected);
+                    b.el.setAttribute('aria-pressed', String(isSelected));
+                });
+
+                const list = [...selected];
+                selectionBox.hidden = toolbar.hidden = list.length === 0;
+                if (!list.length) return;
+
+                const box = bounds(list);
+                selectionBox.classList.toggle('multi', list.length > 1);
+                selectionBox.style.left = `${box.x / W * 100}%`;
+                selectionBox.style.top = `${box.y / T * 100}%`;
+                selectionBox.style.width = `${box.w / W * 100}%`;
+                selectionBox.style.height = `${box.h / T * 100}%`;
+
+                const reason = whyDisabled();
+                duplicateButton.setAttribute('aria-disabled', String(Boolean(reason)));
+                duplicateTip.innerHTML = reason
+                    ? 'Can’t duplicate'
+                    : `Duplicate${shortcut.map(key => `<kbd>${key}</kbd>`).join('')}`;
+
+                // Above the selection, or below it if there's no room
+                const scale = stage.clientWidth / W;
+                const barW = toolbar.offsetWidth / scale;
+                const barH = toolbar.offsetHeight / scale;
+                const gap = 16 / scale;
+                let top = box.y - barH - gap;
+                if (top < 0) top = box.y + box.h + gap;
+                if (top + barH > T) top = 0;
+                toolbar.style.left = `${clamp(box.x, 0, W - barW) / W * 100}%`;
+                toolbar.style.top = `${top / T * 100}%`;
+            };
+
+            const selectOnly = (block) => {
+                selected.clear();
+                selected.add(block);
+                render();
+            };
+
+            const toggle = (block) => {
+                if ([...selected].some(b => b.section !== block.section)) {
+                    say(ACROSS_SECTIONS);
+                    return;
+                }
+                selected.has(block) ? selected.delete(block) : selected.add(block);
+                render();
+            };
+
+            const clear = () => {
+                selected.clear();
+                render();
+            };
+
+            // A copy lands to the bottom right. At the right edge it goes
+            // straight down instead. At the bottom the section grows to fit it.
+            const duplicate = () => {
+                const reason = whyDisabled();
+                if (reason) {
+                    say(reason);
+                    return;
+                }
+
+                const list = [...selected];
+                const section = list[0].section;
+                const right = Math.max(...list.map(b => b.x + b.w));
+                const bottom = Math.max(...list.map(b => b.y + b.h));
+                const atRight = right + OFFSET > W;
+                const grows = bottom + OFFSET > heights[section];
+                const dx = atRight ? 0 : OFFSET;
+
+                if (grows) {
+                    heights[section] = bottom + OFFSET;
+                    layOut();
+                }
+
+                const moveFocus = stage.contains(document.activeElement);
+                const copies = list.map((original) => {
+                    const { el, ...def } = original;
+                    const copy = addBlock(def);
+                    copy.el.classList.add('arriving');
+                    return copy;
+                });
+                stage.offsetWidth; // start the slide from the original's position
+                copies.forEach((copy) => {
+                    copy.x += dx;
+                    copy.y += OFFSET;
+                    place(copy);
+                    setTimeout(() => copy.el.classList.remove('arriving'), 250);
+                });
+
+                selected.clear();
+                copies.forEach(copy => selected.add(copy));
+                render();
+                if (moveFocus) copies[0].el.focus({ preventScroll: true });
+
+                const direction = atRight ? 'straight down' : 'to the bottom right';
+                if (grows) say(`The copy went ${direction}, and the section got taller to fit it.`);
+                else if (atRight) say('At the right edge, so the copy went straight down.');
+                else say('Copied to the bottom right.');
+            };
+
+            const remove = () => {
+                const moveFocus = stage.contains(document.activeElement);
+                selected.forEach((block) => {
+                    block.el.remove();
+                    blocks = blocks.filter(b => b !== block);
+                });
+                clear();
+                if (moveFocus) stage.focus({ preventScroll: true });
+                say(blocks.length ? 'Deleted.' : 'Deleted. Reset to bring the blocks back.');
+            };
+
+            // Moves the selection together, stopping when any block hits the
+            // edge of its section
+            const moveBy = (origins, dx, dy) => {
+                let minX = -Infinity, maxX = Infinity, minY = -Infinity, maxY = Infinity;
+                origins.forEach(({ block, x, y }) => {
+                    minX = Math.max(minX, -x);
+                    maxX = Math.min(maxX, W - block.w - x);
+                    minY = Math.max(minY, -y);
+                    maxY = Math.min(maxY, heights[block.section] - block.h - y);
+                });
+                const moveX = clamp(dx, minX, maxX);
+                const moveY = clamp(dy, minY, maxY);
+                origins.forEach(({ block, x, y }) => {
+                    block.x = x + moveX;
+                    block.y = y + moveY;
+                    place(block);
+                });
+                render();
+            };
+
+            const origins = () => [...selected].map(block => ({ block, x: block.x, y: block.y }));
+
+            stage.addEventListener('pointerdown', (e) => {
+                if (e.target.closest('.toolbar, .sandbox-controls')) return;
+                const el = e.target.closest('.block');
+                if (!el) {
+                    clear();
+                    return;
+                }
+
+                const block = el.block;
+                const additive = e.shiftKey || e.metaKey || e.ctrlKey
+                    || selectSeveral.getAttribute('aria-pressed') === 'true';
+                const wasSelected = selected.has(block);
+
+                if (additive) toggle(block);
+                else if (!wasSelected) selectOnly(block);
+
+                try { el.setPointerCapture(e.pointerId); } catch {}
+                drag = {
+                    block, additive, wasSelected,
+                    startX: e.clientX, startY: e.clientY,
+                    origins: origins(),
+                    moved: false,
+                };
+            });
+
+            stage.addEventListener('pointermove', (e) => {
+                if (!drag || !selected.has(drag.block)) return;
+                const scale = stage.clientWidth / W;
+                const dx = (e.clientX - drag.startX) / scale;
+                const dy = (e.clientY - drag.startY) / scale;
+                if (!drag.moved && Math.hypot(dx, dy) * scale < 4) return;
+                drag.moved = true;
+                stage.classList.add('dragging');
+                moveBy(drag.origins, Math.round(dx / GRID) * GRID, Math.round(dy / GRID) * GRID);
+            });
+
+            const endDrag = (e) => {
+                if (!drag) return;
+                // Clicking one block of a multiselect narrows to just that block
+                if (e.type === 'pointerup' && !drag.moved && !drag.additive && drag.wasSelected) {
+                    selectOnly(drag.block);
+                }
+                stage.classList.remove('dragging');
+                drag = null;
+            };
+            stage.addEventListener('pointerup', endDrag);
+            stage.addEventListener('pointercancel', endDrag);
+
+            // Clicking anywhere outside the sandbox deselects
+            document.addEventListener('pointerdown', (e) => {
+                if (!e.target.closest('#stage')) clear();
+            });
+
+            duplicateButton.addEventListener('click', duplicate);
+            deleteButton.addEventListener('click', remove);
+
+            document.addEventListener('keydown', (e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'd' && selected.size) {
+                    e.preventDefault();
+                    duplicate();
+                    return;
+                }
+                if (!stage.contains(e.target) || e.target.closest('.sandbox-controls')) return;
+
+                const el = e.target.closest('.block');
+                if (el && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault();
+                    e.shiftKey ? toggle(el.block) : selectOnly(el.block);
+                } else if (selected.size && (e.key === 'Delete' || e.key === 'Backspace')) {
+                    e.preventDefault();
+                    remove();
+                } else if (e.key === 'Escape') {
+                    clear();
+                } else if (selected.size && e.key.startsWith('Arrow')) {
+                    e.preventDefault();
+                    const dx = e.key === 'ArrowLeft' ? -GRID : e.key === 'ArrowRight' ? GRID : 0;
+                    const dy = e.key === 'ArrowUp' ? -GRID : e.key === 'ArrowDown' ? GRID : 0;
+                    moveBy(origins(), dx, dy);
+                }
+            });
+
+            selectSeveral.addEventListener('click', () => {
+                const on = selectSeveral.getAttribute('aria-pressed') !== 'true';
+                selectSeveral.setAttribute('aria-pressed', String(on));
+            });
+
+            const loadStep = () => {
+                const step = steps[stepIndex];
+                const layout = narrow.matches ? 'narrow' : 'wide';
+                W = SIZES[layout].W;
+                heights = Array(step.sections).fill(SIZES[layout].height / step.sections);
+                blocks.forEach(b => b.el.remove());
+                blocks = [];
+                selected.clear();
+
+                layOut();
+                stage.style.setProperty('--u', `${stage.clientWidth / W}px`);
+                stage.classList.toggle('two-sections', step.sections === 2);
+                secondBand.hidden = step.sections !== 2;
+                step[layout].forEach((def) => {
+                    const block = addBlock(def);
+                    if (!step.selectFirstOnly || !selected.size) selected.add(block);
+                });
+
+                document.getElementById('step-count').textContent = `${stepIndex + 1} / ${steps.length}`;
+                document.getElementById('step-title').textContent = step.title;
+                document.getElementById('step-text').textContent = step.text;
+                render();
+                say(step.hint);
+            };
+
+            const goToStep = (change) => {
+                stepIndex = (stepIndex + change + steps.length) % steps.length;
+                loadStep();
+            };
+
+            document.getElementById('step-previous').addEventListener('click', () => goToStep(-1));
+            document.getElementById('step-next').addEventListener('click', () => goToStep(1));
+            document.getElementById('sandbox-reset').addEventListener('click', loadStep);
+            narrow.addEventListener('change', loadStep);
+            new ResizeObserver(() => {
+                stage.style.setProperty('--u', `${stage.clientWidth / W}px`);
+                render();
+            }).observe(stage);
+
+            loadStep();
+        })();
+    </script>
+</body>
+</html>

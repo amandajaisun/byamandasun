@@ -1,0 +1,178 @@
+/* Shared styles for every page. Page-specific styles stay in each page's <style>. */
+
+:root {
+    /* Colors (contrast on white: --ink 11.0:1, --accent 5.0:1, both WCAG AA) */
+    --ink: #343E3D;
+    --accent: #607466;
+    --paper: white;
+    --hover-tint: color-mix(in srgb, var(--accent) 12%, transparent);
+
+    /* Type */
+    --font: 'DM Sans', sans-serif;
+    --size-nav: clamp(14px, 2.5vw, 32px);
+    --size-body: clamp(12px, 1.5vw, 18px);
+    --size-small: clamp(11px, 1.1vw, 14px);
+
+    /* DM Sans is a variable font: weight is continuous, so it can animate */
+    --weight-regular: 400;
+    --weight-hover: 560;
+    --weight-transition: font-weight 0.25s ease, color 0.2s ease;
+
+    --gutter: 20px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font);
+    font-weight: var(--weight-regular);
+    font-optical-sizing: auto;
+    min-height: 100vh;
+}
+
+/* Keyboard focus is always visible (WCAG 2.4.7) */
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+
+/* Skip-link and script focus targets aren't interactive, so no ring */
+[tabindex="-1"]:focus {
+    outline: none;
+}
+
+/* Hidden visually, still read by screen readers */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* Lets keyboard users jump past the nav (WCAG 2.4.1) */
+.skip-link {
+    position: fixed;
+    top: -100px;
+    left: var(--gutter);
+    z-index: 300;
+    background: var(--paper);
+    color: var(--ink);
+    padding: 8px 12px;
+    font-size: var(--size-small);
+    text-decoration: none;
+
+    &:focus {
+        top: 60px;
+    }
+}
+
+/* Navigation */
+#nav-pane {
+    position: fixed;
+    top: var(--gutter);
+    left: var(--gutter);
+    display: flex;
+    gap: 16px;
+    z-index: 100;
+    line-height: 1;
+}
+
+.nav-item {
+    text-decoration: none;
+    color: var(--accent);
+    font-size: var(--size-nav);
+    font-variant-numeric: tabular-nums;
+    transition: var(--weight-transition);
+    cursor: pointer;
+
+    &:hover {
+        color: var(--ink);
+        font-weight: var(--weight-hover);
+    }
+
+    &.active,
+    &[aria-current="page"] {
+        color: var(--ink);
+    }
+}
+
+/* Signature */
+#signature {
+    position: fixed;
+    top: var(--gutter);
+    right: var(--gutter);
+    color: var(--ink);
+    font-size: var(--size-nav);
+    font-weight: var(--weight-regular);
+    z-index: 100;
+    line-height: 1;
+}
+
+/* Text links animate their weight on hover */
+.text-link {
+    color: var(--accent);
+    text-decoration: none;
+    transition: var(--weight-transition);
+
+    &:hover {
+        color: var(--ink);
+        font-weight: var(--weight-hover);
+    }
+}
+
+/* Media with a white background: video decoding leaves the white slightly grey,
+   so lift it back to pure white so no box shows against the page */
+.on-white {
+    filter: brightness(1.05);
+}
+
+/* Clicking a looping video pauses or plays it */
+video[data-pausable] {
+    cursor: pointer;
+}
+
+/* Pause/play control for anything that moves for more than 5s (WCAG 2.2.2) */
+.motion-toggle {
+    font-family: var(--font);
+    font-size: var(--size-small);
+    color: var(--accent);
+    background: var(--paper);
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    padding: 4px 12px;
+    cursor: pointer;
+    transition: var(--weight-transition), background 0.2s ease;
+
+    &:hover {
+        color: var(--ink);
+        background: var(--hover-tint);
+    }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --size-nav: 14px;
+        --size-body: 14px;
+        --size-small: 12px;
+    }
+}
+
+/* Respect the system "reduce motion" setting */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
