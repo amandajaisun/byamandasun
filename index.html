@@ -53,7 +53,7 @@
             appearance: none;
             writing-mode: vertical-lr;
             direction: rtl;
-            height: clamp(120px, 30vh, 240px);
+            height: clamp(80px, 20vh, 160px);
             width: var(--knob);
             margin: 0;
             background: none;
@@ -291,9 +291,11 @@
             drawLeaves = true;
 
             const isMobile = windowWidth <= 768;
-            nSegments = Math.max(Math.round(windowHeight * 0.02), 7);
+            // Branches and leaves multiply with both of these, so they're capped:
+            // a large, narrow window otherwise grows millions of leaves
+            nSegments = Math.min(Math.max(Math.round(windowHeight * 0.02), 7), 22);
             totalBranchLength = isMobile ? windowHeight * 0.5 : windowWidth * 0.4;
-            maxBranchThickness = isMobile ? windowWidth * 0.01 : windowWidth * 0.006;
+            maxBranchThickness = isMobile ? Math.min(windowWidth * 0.01, 4) : windowWidth * 0.006;
             maxBranchSizeForLeaves = 5;
             minBranchThickness = 2;
             minSpawnDistance = 0.1;

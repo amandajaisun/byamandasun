@@ -50,7 +50,7 @@
         .image-item img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain; /* never crop, even if a configured size is off */
             display: block;
         }
 
@@ -229,15 +229,16 @@
         // CONFIGURE YOUR IMAGES HERE
         // ========================================
         const images = [
-            { src: 'imgs/illustration/IMG_0024.jpg', width: 420, height: 600, caption: 'acrylic on skateboard' },
-            { src: 'imgs/animation/cervest_animation_folder.gif', width: 400, height: 400, caption: 'motion design internship, adobe aftereffects' },
-            { src: 'imgs/animation/block dup.gif', width: 400, height: 400, caption: 'squarespace block duplication, design handoff and edge casing' },
-            { src: 'imgs/id/box.jpg', width: 400, height: 400, caption: '6 identical puzzle pieces that slide into a cube, cnc router + prototyping' },
-            { src: 'imgs/illustration/I_miss_empty_nesting.png', width: 450, height: 350, alt: 'illustration: i miss empty nesting' },
-            { src: 'imgs/illustration/I-m_Sick_Of_This_Clean_Air.png', width: 380, height: 420, alt: "illustration: i'm sick of this clean air" },
-            { src: 'imgs/illustration/Phase_4_Can-t_Come_Quicker.png', width: 500, height: 600, alt: "illustration: phase 4 can't come quicker" },
-            { src: 'imgs/illustration/kegshirts5.png', width: 420, height: 320, caption: 'solo business for sold-out tees, procreate' },
+            { src: 'imgs/illustration/IMG_0024.jpg', width: 420, height: 560, caption: 'acrylic on skateboard' },
+            { src: 'imgs/animation/cervest_animation_folder.gif', width: 400, height: 225, caption: 'motion design internship, adobe aftereffects' },
+            { src: 'imgs/id/box.jpg', width: 400, height: 438, caption: '6 identical puzzle pieces that slide into a cube, cnc router + prototyping' },
+            { src: 'imgs/illustration/I_miss_empty_nesting.png', width: 450, height: 338, alt: 'illustration: i miss empty nesting' },
+            { src: 'imgs/illustration/I-m_Sick_Of_This_Clean_Air.png', width: 380, height: 285, alt: "illustration: i'm sick of this clean air" },
+            { src: 'imgs/illustration/Phase_4_Can-t_Come_Quicker.png', width: 500, height: 375, alt: "illustration: phase 4 can't come quicker" },
+            { src: 'imgs/illustration/kegshirts5.png', width: 420, height: 560, caption: 'solo business for sold-out tees, procreate' },
         ];
+        // How much bigger items are drawn than the sizes above
+        const ITEM_SCALE = 1.5;
         // ========================================
 
         const canvas = document.getElementById('canvas');
@@ -267,8 +268,8 @@
             imageEl.className = 'image-item';
             imageEl.style.left = `${pos.x}px`;
             imageEl.style.top = `${pos.y}px`;
-            imageEl.style.width = `${img.width}px`;
-            imageEl.style.height = `${img.height}px`;
+            imageEl.style.width = `${img.width * ITEM_SCALE}px`;
+            imageEl.style.height = `${img.height * ITEM_SCALE}px`;
 
             const imgTag = document.createElement('img');
             imgTag.src = img.src;
@@ -376,6 +377,7 @@
         function centerToShowAllImages() {
             if (isMobile) return;
             let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+            let baseMaxX = -Infinity, baseMaxY = -Infinity;
             document.querySelectorAll('.image-item').forEach(el => {
                 const left = parseFloat(el.style.left);
                 const top = parseFloat(el.style.top);
@@ -385,12 +387,16 @@
                 minY = Math.min(minY, top);
                 maxX = Math.max(maxX, left + w);
                 maxY = Math.max(maxY, top + h);
+                baseMaxX = Math.max(baseMaxX, left + w / ITEM_SCALE);
+                baseMaxY = Math.max(baseMaxY, top + h / ITEM_SCALE);
             });
             const contentCenterX = (minX + maxX) / 2;
             const contentCenterY = (minY + maxY) / 2;
-            const scaleX = window.innerWidth / (maxX - minX);
-            const scaleY = window.innerHeight / (maxY - minY);
-            scale = Math.min(scaleX, scaleY) * 0.9;
+            // Zoom as if items were their configured size, so ITEM_SCALE really
+            // makes them bigger on screen, unless that would push any off screen
+            const baseFit = Math.min(window.innerWidth / (baseMaxX - minX), window.innerHeight / (baseMaxY - minY)) * 0.9;
+            const actualFit = Math.min(window.innerWidth / (maxX - minX), window.innerHeight / (maxY - minY));
+            scale = Math.min(baseFit, actualFit);
             currentX = window.innerWidth / 2 - contentCenterX * scale;
             currentY = window.innerHeight / 2 - contentCenterY * scale;
             updateTransform();
