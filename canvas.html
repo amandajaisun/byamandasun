@@ -3,23 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canvas</title>
+    <title>canvas — amanda sun</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="site.js" defer></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            background: white;
             overflow: hidden;
             cursor: grab;
             user-select: none;
-            font-family: 'DM Sans', sans-serif;
         }
 
         body.grabbing {
@@ -45,6 +39,12 @@
 
         .image-item {
             position: absolute;
+            display: block;
+            padding: 0;
+            border: none;
+            background: none;
+            font: inherit;
+            cursor: zoom-in;
         }
 
         .image-item img {
@@ -52,42 +52,6 @@
             height: 100%;
             object-fit: cover;
             display: block;
-        }
-
-        /* Navigation */
-        #nav-pane {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            display: flex;
-            gap: 16px;
-            z-index: 100;
-            line-height: 1;
-        }
-
-        .nav-item {
-            text-decoration: none;
-            color: #607466;
-            font-size: clamp(14px, 2.5vw, 32px);
-            font-family: 'DM Sans', sans-serif;
-            transition: color 0.2s;
-            cursor: pointer;
-        }
-
-        .nav-item.active {
-            color: #343E3D;
-        }
-
-        /* Signature */
-        #signature {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            color: #343E3D;
-            font-size: clamp(14px, 2.5vw, 32px);
-            font-family: 'DM Sans', sans-serif;
-            z-index: 100;
-            line-height: 1;
         }
 
         /* Zoom overlay */
@@ -115,7 +79,7 @@
 
         #zoom-caption {
             margin-top: 20px;
-            color: #607466;
+            color: var(--accent);
             font-size: clamp(12px, 1.5vw, 20px);
             text-align: center;
         }
@@ -127,7 +91,7 @@
             transform: translateY(-50%);
             background: transparent;
             border: none;
-            color: #607466;
+            color: var(--accent);
             font-size: clamp(16px, 2vw, 28px);
             width: 40px;
             height: 40px;
@@ -139,7 +103,7 @@
             transition: color 0.2s;
         }
 
-        .zoom-arrow:hover { color: #343E3D; }
+        .zoom-arrow:hover { color: var(--ink); }
         .zoom-arrow.visible { display: flex; }
 
         #prev-arrow { left: 20px; }
@@ -147,11 +111,14 @@
 
         #escape-hint {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            color: #607466;
-            font-size: clamp(10px, 1vw, 14px);
-            font-family: 'DM Sans', sans-serif;
+            top: var(--gutter);
+            right: var(--gutter);
+            color: var(--accent);
+            font-family: var(--font);
+            font-size: var(--size-small);
+            background: none;
+            border: none;
+            cursor: pointer;
             z-index: 201;
             display: none;
         }
@@ -211,14 +178,12 @@
             .mobile-caption {
                 display: block !important;
                 margin-top: 10px;
-                color: #607466;
+                color: var(--accent);
                 font-size: 12px;
                 text-align: center;
                 padding: 0 10px;
             }
 
-            .nav-item { font-size: 14px; }
-            #signature { font-size: 14px; }
             .zoom-arrow { display: none !important; }
             #zoom-overlay { display: none !important; }
             #escape-hint { display: none !important; }
@@ -226,33 +191,38 @@
     </style>
 </head>
 <body>
-    <div id="canvas-container">
-        <div id="canvas"></div>
-    </div>
+    <a class="skip-link" href="#main">skip to content</a>
+
+    <main id="main" tabindex="-1">
+        <h1 class="visually-hidden">canvas</h1>
+        <p class="visually-hidden">Illustration, animation and object work. Drag to move around; select an image to see it larger.</p>
+        <div id="canvas-container">
+            <div id="canvas"></div>
+        </div>
+    </main>
 
     <!-- Zoom overlay -->
-    <div id="zoom-overlay">
+    <div id="zoom-overlay" role="dialog" aria-modal="true" aria-label="enlarged image">
         <img id="zoom-image" src="" alt="">
         <div id="zoom-caption"></div>
     </div>
 
     <!-- Arrow navigation -->
-    <button id="prev-arrow" class="zoom-arrow">←</button>
-    <button id="next-arrow" class="zoom-arrow">→</button>
+    <button id="prev-arrow" class="zoom-arrow" aria-label="previous image">←</button>
+    <button id="next-arrow" class="zoom-arrow" aria-label="next image">→</button>
 
     <!-- Escape hint -->
-    <div id="escape-hint">hit esc</div>
+    <button id="escape-hint" type="button" aria-label="close (esc)">hit esc</button>
 
     <!-- Navigation Pane -->
-    <nav id="nav-pane">
-        <a href="index.html" class="nav-item" data-key="1">1</a>
-        <a href="canvas.html" class="nav-item active" data-key="2">2</a>
-        <a href="ux.html" class="nav-item" data-key="3">3</a>
-        <a href="links.html" class="nav-item" data-key="4">4</a>
+    <nav id="nav-pane" aria-label="pages">
+        <a href="ux.html" class="nav-item" data-key="2" aria-keyshortcuts="2">design</a>
+        <a href="canvas.html" class="nav-item active" data-key="3" aria-keyshortcuts="3" aria-current="page">art</a>
+        <a href="links.html" class="nav-item" data-key="4" aria-keyshortcuts="4">press</a>
     </nav>
 
     <!-- Signature -->
-    <div id="signature">amanda sun</div>
+    <div id="signature"><a href="index.html" class="nav-item" data-key="1" aria-label="amanda sun: home" aria-keyshortcuts="1">amanda sun</a></div>
 
     <script>
         // ========================================
@@ -263,9 +233,9 @@
             { src: 'imgs/animation/cervest_animation_folder.gif', width: 400, height: 400, caption: 'motion design internship, adobe aftereffects' },
             { src: 'imgs/animation/block dup.gif', width: 400, height: 400, caption: 'squarespace block duplication, design handoff and edge casing' },
             { src: 'imgs/id/box.jpg', width: 400, height: 400, caption: '6 identical puzzle pieces that slide into a cube, cnc router + prototyping' },
-            { src: 'imgs/illustration/I_miss_empty_nesting.png', width: 450, height: 350 },
-            { src: 'imgs/illustration/I-m_Sick_Of_This_Clean_Air.png', width: 380, height: 420 },
-            { src: 'imgs/illustration/Phase_4_Can-t_Come_Quicker.png', width: 500, height: 600 },
+            { src: 'imgs/illustration/I_miss_empty_nesting.png', width: 450, height: 350, alt: 'illustration: i miss empty nesting' },
+            { src: 'imgs/illustration/I-m_Sick_Of_This_Clean_Air.png', width: 380, height: 420, alt: "illustration: i'm sick of this clean air" },
+            { src: 'imgs/illustration/Phase_4_Can-t_Come_Quicker.png', width: 500, height: 600, alt: "illustration: phase 4 can't come quicker" },
             { src: 'imgs/illustration/kegshirts5.png', width: 420, height: 320, caption: 'solo business for sold-out tees, procreate' },
         ];
         // ========================================
@@ -292,7 +262,8 @@
 
         images.forEach((img, index) => {
             const pos = getRandomPosition(index, images.length);
-            const imageEl = document.createElement('div');
+            const imageEl = document.createElement('button');
+            imageEl.type = 'button';
             imageEl.className = 'image-item';
             imageEl.style.left = `${pos.x}px`;
             imageEl.style.top = `${pos.y}px`;
@@ -301,7 +272,7 @@
 
             const imgTag = document.createElement('img');
             imgTag.src = img.src;
-            imgTag.alt = `Image ${index + 1}`;
+            imgTag.alt = img.alt || img.caption || '';
             imgTag.draggable = false;
             imageEl.appendChild(imgTag);
 
@@ -350,16 +321,21 @@
         const prevArrow = document.getElementById('prev-arrow');
         const nextArrow = document.getElementById('next-arrow');
 
+        let returnFocusTo = null;
+
         function showZoomedImage(index) {
             if (isMobile) return;
+            if (currentZoomIndex < 0) returnFocusTo = document.activeElement;
             currentZoomIndex = index;
             const img = images[index];
             zoomImage.src = img.src;
+            zoomImage.alt = img.alt || img.caption || '';
             zoomCaption.textContent = img.caption || '';
             zoomOverlay.classList.add('active');
             escapeHint.classList.add('visible');
             prevArrow.classList.add('visible');
             nextArrow.classList.add('visible');
+            escapeHint.focus();
         }
 
         function hideZoomedImage() {
@@ -369,8 +345,12 @@
             nextArrow.classList.remove('visible');
             zoomImage.src = '';
             zoomCaption.textContent = '';
+            const wasOpen = currentZoomIndex >= 0;
             currentZoomIndex = -1;
+            if (wasOpen && returnFocusTo) returnFocusTo.focus();
         }
+
+        escapeHint.addEventListener('click', hideZoomedImage);
 
         function showNextImage() {
             if (currentZoomIndex >= 0) {
@@ -433,10 +413,17 @@
             if (currentZoomIndex >= 0) {
                 if (e.key === 'ArrowLeft') { showPreviousImage(); return; }
                 if (e.key === 'ArrowRight') { showNextImage(); return; }
+                if (e.key === 'Tab') {
+                    // Keep focus inside the open dialog
+                    const controls = [escapeHint, prevArrow, nextArrow];
+                    const i = controls.indexOf(document.activeElement);
+                    const next = (i + (e.shiftKey ? -1 : 1) + controls.length) % controls.length;
+                    controls[next].focus();
+                    e.preventDefault();
+                }
+                // Don't let number keys navigate away while the dialog is open
+                if (/^[0-9]$/.test(e.key)) e.preventDefault();
             }
-            document.querySelectorAll('.nav-item').forEach(item => {
-                if (item.dataset.key === e.key) window.location.href = item.href;
-            });
         });
     </script>
 </body>

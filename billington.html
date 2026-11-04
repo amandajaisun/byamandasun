@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tree — amanda sun</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="project.css">
+    <script src="site.js" defer></script>
+    <script src="project.js" defer></script>
+    <style>
+        /* The tree stays behind the hero text, positioned against the hero */
+        .hero {
+            position: relative;
+        }
+
+        /* The tree growing, behind all the text from the title to "Inspiration".
+           Its height follows the hero, plus the gap and heading after it, and it
+           centers on the page. Lightened so the text stays readable, and
+           the video's background is slightly off white, so its edges fade out
+           to hide the box */
+        .backdrop-tree {
+            position: absolute;
+            z-index: -1;
+            top: 0;
+            left: 50%;
+            translate: -50% 0;
+            height: calc((100% + 96px) / 0.72);
+            aspect-ratio: 980 / 900;
+            opacity: 0.5;
+            mask-image:
+                linear-gradient(to right, transparent, black 6%, black 94%, transparent),
+                linear-gradient(to bottom, transparent, black 6%, black 94%, transparent);
+            mask-composite: intersect;
+        }
+
+        /* Real trees on the left, the generated tree on the right */
+        .steps {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: start;
+        }
+
+        .step {
+            & video {
+                aspect-ratio: 16 / 10;
+                object-fit: cover;
+            }
+
+            & .clip {
+                margin-bottom: 20px;
+            }
+        }
+
+        .step-name {
+            font-size: clamp(16px, 2vw, 24px);
+            margin-bottom: 12px;
+        }
+
+        .step-description {
+            font-size: clamp(13px, 1.3vw, 16px);
+            font-weight: 300;
+            line-height: 1.6;
+            text-wrap: pretty;
+        }
+
+        @media (max-width: 768px) {
+            /* The tree is wider than a phone: let it reach the screen's edges,
+               then clip it there so the page can't scroll sideways */
+            .hero {
+                margin-inline: -20px;
+                padding-inline: 20px;
+                overflow-x: clip;
+            }
+
+            .steps { grid-template-columns: 1fr; gap: 56px; }
+        }
+    </style>
+</head>
+<body>
+    <a class="skip-link" href="#main">skip to content</a>
+
+    <!-- Navigation Pane -->
+    <nav id="nav-pane" aria-label="pages">
+        <a href="ux.html" class="nav-item active" data-key="2" aria-keyshortcuts="2">design</a>
+        <a href="canvas.html" class="nav-item" data-key="3" aria-keyshortcuts="3">art</a>
+        <a href="links.html" class="nav-item" data-key="4" aria-keyshortcuts="4">press</a>
+    </nav>
+
+    <!-- Signature -->
+    <div id="signature"><a href="index.html" class="nav-item" data-key="1" aria-label="amanda sun: home" aria-keyshortcuts="1">amanda sun</a></div>
+
+    <main id="main" class="container" tabindex="-1">
+        <header class="hero">
+            <!-- Loops like a GIF: no pause button (click still pauses) -->
+            <video class="backdrop-tree" src="imgs/billington/tree-growing.mp4" autoplay loop muted playsinline data-no-pause-button
+                   aria-label="a generative tree growing branches and leaves, then swaying"></video>
+            <div class="hero-top">
+                <div>
+                    <p class="dateline">Stanford Billington Lab</p>
+                    <h1>Tree</h1>
+                </div>
+                <div class="project-links">
+                    <a class="text-link" href="caltrain.html"><span class="link-start">next</span> <span>project</span> <span>→</span></a>
+                    <a class="text-link" href="squarespace.html"><span class="link-start">← prev</span> <span>project</span></a>
+                </div>
+            </div>
+            <dl class="details">
+                <div>
+                    <dt>Time:</dt>
+                    <dd>Winter 2022</dd>
+                </div>
+                <div>
+                    <dt>Role:</dt>
+                    <dd>Interaction Designer</dd>
+                </div>
+                <div>
+                    <dt>Partners:</dt>
+                    <dd>Basma Altaif</dd>
+                </div>
+            </dl>
+            <div class="prose">
+                <h2>Overview</h2>
+                <p>Windowless rooms are endemic in our buildings and have real, negative impacts on their inhabitants.</p>
+                <p>Under Basma Altaif, Sarah Billington, and Elizabeth Murnane, I translated a biophilic research paper’s discoveries into <a class="text-link" href="https://processing.org" target="_blank">Processing<span class="visually-hidden"> (opens in a new tab)</span></a> code.</p>
+            </div>
+        </header>
+
+        <section class="prose">
+            <h2>Inspiration</h2>
+            <blockquote class="quote">“Can natural cues in windowless rooms help humans tell time?”</blockquote>
+            <p>Our goal was to measure this through a projection of a tree whose branches moved with the same wind speed that was recorded outside. Thus, we had to create an auto-generative tree that could change, have a dynamic wind speed, and have multiple iterations.</p>
+        </section>
+
+        <ol class="steps">
+            <li class="step">
+                <video src="imgs/billington/outside-trees.mp4" poster="imgs/billington/outside-trees-poster.jpg" loop muted playsinline preload="metadata" data-no-pause-button data-hover-play
+                       aria-label="trees outside moving in the wind"></video>
+                <h2 class="step-name">Outside</h2>
+                <p class="step-description">The ESP32 detects windspeed changes outside, sending information via wifi.</p>
+            </li>
+            <li class="step">
+                <video src="imgs/billington/tree-wind.mp4" poster="imgs/billington/tree-wind-poster.jpg" loop muted playsinline preload="metadata" data-no-pause-button data-hover-play
+                       aria-label="the generative tree swaying as the wind changes"></video>
+                <h2 class="step-name">Tree</h2>
+                <p class="step-description">Processing picks up the information via wifi, and changes the animation projected indoors to match the changing conditions outside.</p>
+            </li>
+        </ol>
+    </main>
+</body>
+</html>

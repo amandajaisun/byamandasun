@@ -4,58 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex">
-    <title>{{TITLE}}</title>
+    <title>{{TITLE}} — amanda sun</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="site.js" defer></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            background: white;
-            font-family: 'DM Sans', sans-serif;
             padding: 100px 40px 60px;
-            min-height: 100vh;
-        }
-
-        /* Navigation */
-        #nav-pane {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            display: flex;
-            gap: 16px;
-            z-index: 100;
-            line-height: 1;
-        }
-
-        .nav-item {
-            text-decoration: none;
-            color: #607466;
-            font-size: clamp(14px, 2.5vw, 32px);
-            font-family: 'DM Sans', sans-serif;
-            transition: color 0.2s;
-            cursor: pointer;
-        }
-
-        .nav-item.active {
-            color: #343E3D;
-        }
-
-        /* Signature */
-        #signature {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            color: #343E3D;
-            font-size: clamp(14px, 2.5vw, 32px);
-            font-family: 'DM Sans', sans-serif;
-            z-index: 100;
-            line-height: 1;
         }
 
         /* Lock screen */
@@ -65,91 +22,90 @@
             display: flex;
             align-items: center;
             justify-content: center;
-        }
 
-        #lock form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 16px;
-        }
+            & form {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 16px;
+            }
 
-        #lock label {
-            font-size: clamp(12px, 1.5vw, 18px);
-            color: #343E3D;
+            & label {
+                font-size: var(--size-body);
+            }
+
+            & button {
+                font-family: var(--font);
+                font-size: clamp(12px, 1.3vw, 16px);
+                color: var(--accent);
+                background: none;
+                border: none;
+                cursor: pointer;
+                transition: var(--weight-transition);
+
+                &:hover {
+                    color: var(--ink);
+                    font-weight: var(--weight-hover);
+                }
+            }
         }
 
         #password {
-            font-family: 'DM Sans', sans-serif;
+            font-family: var(--font);
             font-size: 16px;
-            color: #343E3D;
+            color: var(--ink);
             border: none;
-            border-bottom: 1px solid #607466;
+            border-bottom: 1px solid var(--accent);
             padding: 6px 2px;
             width: 220px;
             text-align: center;
-            outline: none;
             background: transparent;
-        }
 
-        #password:focus {
-            border-bottom-color: #343E3D;
+            &:focus {
+                border-bottom-color: var(--ink);
+            }
         }
 
         #lock-message {
-            font-size: clamp(11px, 1.1vw, 14px);
-            color: #607466;
+            font-size: var(--size-small);
+            color: var(--accent);
             min-height: 1.2em;
-        }
-
-        #lock button {
-            font-family: 'DM Sans', sans-serif;
-            font-size: clamp(12px, 1.3vw, 16px);
-            color: #607466;
-            background: none;
-            border: none;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        #lock button:hover {
-            color: #343E3D;
         }
 
         #content[hidden], #lock[hidden] {
             display: none;
         }
 
-        /* Mobile styles */
         @media (max-width: 768px) {
             body { padding: 80px 20px 40px; }
-            .nav-item { font-size: 14px; }
-            #signature { font-size: 14px; }
         }
     </style>
 </head>
 <body>
+    <a class="skip-link" href="#main">skip to content</a>
+
     <!-- Navigation Pane -->
-    <nav id="nav-pane">
-        <a href="index.html" class="nav-item" data-key="1">1</a>
-        <a href="canvas.html" class="nav-item" data-key="2">2</a>
-        <a href="ux.html" class="nav-item active" data-key="3">3</a>
-        <a href="links.html" class="nav-item" data-key="4">4</a>
+    <nav id="nav-pane" aria-label="pages">
+        <a href="ux.html" class="nav-item active" data-key="2" aria-keyshortcuts="2">design</a>
+        <a href="canvas.html" class="nav-item" data-key="3" aria-keyshortcuts="3">art</a>
+        <a href="links.html" class="nav-item" data-key="4" aria-keyshortcuts="4">press</a>
     </nav>
 
     <!-- Signature -->
-    <div id="signature">amanda sun</div>
+    <div id="signature"><a href="index.html" class="nav-item" data-key="1" aria-label="amanda sun: home" aria-keyshortcuts="1">amanda sun</a></div>
 
+    <main id="main" tabindex="-1">
     <div id="lock">
         <form id="lock-form">
             <label for="password">this project is password protected</label>
             <input id="password" type="password" autocomplete="current-password" autofocus>
             <button type="submit">enter →</button>
-            <div id="lock-message"></div>
+            <div id="lock-message" role="status" aria-live="polite"></div>
         </form>
     </div>
 
     <div id="content" hidden></div>
+    </main>
 
     <script>
         // Generated by tools/encrypt.py — do not edit by hand.
@@ -210,7 +166,7 @@
                 if (!entry) return;
                 try {
                     el.src = await loadMedia(key, entry);
-                    if (el.tagName === 'VIDEO') el.play().catch(() => {});
+                    if (el.tagName === 'VIDEO' && el.autoplay) el.play().catch(() => {});
                 } catch (err) {
                     console.error('could not load', el.dataset.src, err);
                 }
@@ -229,6 +185,9 @@
                 if (el.tagName === 'VIDEO') nearScreen.observe(el);
                 else show(el);
             });
+
+            const addPauseButtons = () => window.addPauseButtons(content);
+            window.addPauseButtons ? addPauseButtons() : document.addEventListener('DOMContentLoaded', addPauseButtons);
         }
 
         // Stay unlocked for the rest of the browser session
@@ -250,6 +209,7 @@
             try {
                 const key = await deriveKey(input.value);
                 await unlock(key);
+                document.getElementById('main').focus();
                 try {
                     const raw = new Uint8Array(await crypto.subtle.exportKey('raw', key));
                     sessionStorage.setItem(storageKey, btoa(String.fromCharCode(...raw)));
@@ -260,12 +220,6 @@
             }
         });
 
-        document.addEventListener('keydown', (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-            document.querySelectorAll('.nav-item').forEach(item => {
-                if (item.dataset.key === e.key) window.location.href = item.href;
-            });
-        });
     </script>
 </body>
 </html>

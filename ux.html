@@ -3,22 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UX/UI</title>
+    <title>ux/ui — amanda sun</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="site.js" defer></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            background: white;
-            font-family: 'DM Sans', sans-serif;
             padding: 100px 40px 60px;
-            min-height: 100vh;
         }
 
         .container {
@@ -26,46 +19,11 @@
             margin: 0 auto;
         }
 
-        /* Navigation */
-        #nav-pane {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            display: flex;
-            gap: 16px;
-            z-index: 100;
-            line-height: 1;
-        }
-
-        .nav-item {
-            text-decoration: none;
-            color: #607466;
-            font-size: clamp(14px, 2.5vw, 32px);
-            font-family: 'DM Sans', sans-serif;
-            transition: color 0.2s;
-            cursor: pointer;
-        }
-
-        .nav-item.active {
-            color: #343E3D;
-        }
-
-        /* Signature */
-        #signature {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            color: #343E3D;
-            font-size: clamp(14px, 2.5vw, 32px);
-            font-family: 'DM Sans', sans-serif;
-            z-index: 100;
-            line-height: 1;
-        }
-
         /* Projects */
         .intro {
-            font-size: clamp(12px, 1.5vw, 18px);
-            color: #607466;
+            font-size: var(--size-body);
+            font-weight: var(--weight-regular);
+            color: var(--accent);
             max-width: 560px;
             margin-bottom: 80px;
         }
@@ -76,6 +34,11 @@
             gap: 48px;
             align-items: start;
             margin-bottom: 120px;
+
+            /* No media: let the text use the full width */
+            &:not(:has(.project-media > *)) {
+                grid-template-columns: 1fr;
+            }
         }
 
         .project-text {
@@ -85,66 +48,65 @@
 
         .project-name {
             font-size: clamp(14px, 2vw, 24px);
-            color: #343E3D;
-            font-weight: normal;
+            color: var(--ink);
+            font-weight: var(--weight-regular);
             margin-bottom: 8px;
         }
 
         .project-meta {
-            font-size: clamp(11px, 1.1vw, 14px);
-            color: #607466;
+            font-size: var(--size-small);
+            color: var(--accent);
             margin-bottom: 20px;
         }
 
         .project-description {
             font-size: clamp(12px, 1.3vw, 16px);
-            color: #343E3D;
+            color: var(--ink);
             font-weight: 300;
             line-height: 1.6;
-        }
+            max-width: 60ch;
+            text-wrap: pretty;
 
-        .project-description p + p {
-            margin-top: 12px;
+            & p + p {
+                margin-top: 12px;
+            }
         }
 
         .project-link {
             display: inline-block;
             margin-top: 20px;
-            color: #607466;
-            text-decoration: none;
             font-size: clamp(12px, 1.3vw, 16px);
-            transition: color 0.2s;
-        }
-
-        .project-link:hover {
-            color: #343E3D;
         }
 
         .project-media {
             display: flex;
             flex-direction: column;
             gap: 24px;
-        }
 
-        .project-media img,
-        .project-media video {
-            width: 100%;
-            height: auto;
-            display: block;
+            &.side-by-side {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                align-items: center;
+            }
+
+            & img,
+            & video {
+                width: 100%;
+                height: auto;
+                display: block;
+            }
         }
 
         .media-caption {
             margin-top: 8px;
             font-size: clamp(11px, 1vw, 13px);
-            color: #607466;
+            color: var(--accent);
         }
 
         /* Mobile styles */
         @media (max-width: 768px) {
             body { padding: 80px 20px 40px; }
-            .nav-item { font-size: 14px; }
-            #signature { font-size: 14px; }
-            .intro { font-size: 14px; margin-bottom: 48px; }
+            .intro { margin-bottom: 48px; }
             .project {
                 grid-template-columns: 1fr;
                 gap: 20px;
@@ -152,7 +114,6 @@
             }
             .project-text { position: static; }
             .project-name { font-size: 16px; }
-            .project-meta { font-size: 12px; }
             .project-description { font-size: 14px; }
             .project-link { font-size: 14px; }
             .media-caption { font-size: 12px; }
@@ -160,21 +121,22 @@
     </style>
 </head>
 <body>
+    <a class="skip-link" href="#main">skip to content</a>
+
     <!-- Navigation Pane -->
-    <nav id="nav-pane">
-        <a href="index.html" class="nav-item" data-key="1">1</a>
-        <a href="canvas.html" class="nav-item" data-key="2">2</a>
-        <a href="ux.html" class="nav-item active" data-key="3">3</a>
-        <a href="links.html" class="nav-item" data-key="4">4</a>
+    <nav id="nav-pane" aria-label="pages">
+        <a href="ux.html" class="nav-item active" data-key="2" aria-keyshortcuts="2" aria-current="page">design</a>
+        <a href="canvas.html" class="nav-item" data-key="3" aria-keyshortcuts="3">art</a>
+        <a href="links.html" class="nav-item" data-key="4" aria-keyshortcuts="4">press</a>
     </nav>
 
     <!-- Signature -->
-    <div id="signature">amanda sun</div>
+    <div id="signature"><a href="index.html" class="nav-item" data-key="1" aria-label="amanda sun: home" aria-keyshortcuts="1">amanda sun</a></div>
 
-    <div class="container">
-        <div class="intro">ux / ui</div>
+    <main id="main" class="container" tabindex="-1">
+        <h1 class="intro">ux / ui</h1>
         <div id="projects"></div>
-    </div>
+    </main>
 
     <script>
         // ========================================
@@ -192,7 +154,7 @@
                 description: [
                     'when is my next train? an at-a-glance way for daily commuters to see the next caltrain.',
                 ],
-                link: { text: 'view case study (password protected)', href: 'caltrain.html' },
+                link: { text: 'read more', href: 'caltrain.html' },
             },
             {
                 name: 'block duplication',
@@ -205,6 +167,19 @@
                     { src: 'imgs/animation/block dup.gif' },
                 ],
             },
+            {
+                name: 'tree',
+                meta: 'stanford billington laboratory · processing + esp32',
+                description: [
+                    'bringing the outdoors into windowless rooms: a sensor outside measures the wind, and a generative tree projected indoors sways to match.',
+                ],
+                link: { text: 'read more', href: 'billington.html' },
+                mediaSideBySide: true,
+                media: [
+                    { src: 'imgs/billington/outside-trees.mp4', alt: 'trees outside moving in the wind', pauseButton: false },
+                    { src: 'imgs/billington/tree-wind.mp4', alt: 'a generative tree swaying in the wind', onWhite: true, pauseButton: false },
+                ],
+            },
             // {
             //     name: 'project name',
             //     meta: 'role · company · year',
@@ -213,7 +188,10 @@
             //         'what you did and what changed.',
             //     ],
             //     link: { text: 'read more', href: 'https://...' },
+            //     mediaSideBySide: true,  // optional: media in a row instead of stacked
             //     media: [
+            //         // onWhite: true blends a white background into the page
+            //         // pauseButton: false hides a video's pause button (click still pauses)
             //         { src: 'imgs/ux/example.png', caption: 'final screens' },
             //     ],
             // },
@@ -223,13 +201,13 @@
         const projectsEl = document.getElementById('projects');
 
         projects.forEach(project => {
-            const projectEl = document.createElement('div');
+            const projectEl = document.createElement('article');
             projectEl.className = 'project';
 
             const textEl = document.createElement('div');
             textEl.className = 'project-text';
 
-            const nameEl = document.createElement('div');
+            const nameEl = document.createElement('h2');
             nameEl.className = 'project-name';
             nameEl.textContent = project.name;
             textEl.appendChild(nameEl);
@@ -252,15 +230,22 @@
 
             if (project.link) {
                 const linkEl = document.createElement('a');
-                linkEl.className = 'project-link';
+                linkEl.className = 'project-link text-link';
                 linkEl.href = project.link.href;
-                if (/^https?:/.test(project.link.href)) linkEl.target = '_blank';
                 linkEl.textContent = project.link.text + ' →';
+                if (/^https?:/.test(project.link.href)) {
+                    linkEl.target = '_blank';
+                    const note = document.createElement('span');
+                    note.className = 'visually-hidden';
+                    note.textContent = ' (opens in a new tab)';
+                    linkEl.appendChild(note);
+                }
                 textEl.appendChild(linkEl);
             }
 
             const mediaEl = document.createElement('div');
             mediaEl.className = 'project-media';
+            if (project.mediaSideBySide) mediaEl.classList.add('side-by-side');
             (project.media || []).forEach(item => {
                 const figure = document.createElement('div');
                 let el;
@@ -271,12 +256,15 @@
                     el.loop = true;
                     el.muted = true;
                     el.playsInline = true;
+                    el.setAttribute('aria-label', item.alt || item.caption || project.name);
+                    if (item.pauseButton === false) el.dataset.noPauseButton = '';
                 } else {
                     el = document.createElement('img');
                     el.src = item.src;
-                    el.alt = item.caption || project.name;
+                    el.alt = item.alt || item.caption || project.name;
                     el.loading = 'lazy';
                 }
+                if (item.onWhite) el.classList.add('on-white');
                 figure.appendChild(el);
                 if (item.caption) {
                     const captionEl = document.createElement('div');
@@ -290,13 +278,6 @@
             projectEl.appendChild(textEl);
             projectEl.appendChild(mediaEl);
             projectsEl.appendChild(projectEl);
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-            document.querySelectorAll('.nav-item').forEach(item => {
-                if (item.dataset.key === e.key) window.location.href = item.href;
-            });
         });
     </script>
 </body>

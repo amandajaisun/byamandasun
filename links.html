@@ -3,22 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Press & Links</title>
+    <title>press &amp; links — amanda sun</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="site.js" defer></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            background: white;
-            font-family: 'DM Sans', sans-serif;
             padding: 60px 40px;
-            min-height: 100vh;
         }
 
         .container {
@@ -26,158 +19,98 @@
             margin: 0 auto;
         }
 
-        /* Navigation */
-        #nav-pane {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            display: flex;
-            gap: 16px;
-            z-index: 100;
-            line-height: 1;
-        }
-
-        .nav-item {
-            text-decoration: none;
-            color: #607466;
-            font-size: clamp(14px, 2.5vw, 32px);
-            font-family: 'DM Sans', sans-serif;
-            transition: color 0.2s;
-            cursor: pointer;
-        }
-
-        .nav-item.active {
-            color: #343E3D;
-        }
-
-        /* Signature */
-        #signature {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            color: #343E3D;
-            font-size: clamp(14px, 2.5vw, 32px);
-            font-family: 'DM Sans', sans-serif;
-            z-index: 100;
-            line-height: 1;
-        }
-
-        /* Content sections */
         .section {
-            margin-top: 20px;
+            margin-block: 20px;
+        }
+
+        .section-title,
+        .project-name {
+            font-size: var(--size-body);
+            color: var(--ink);
+            font-weight: var(--weight-regular);
             margin-bottom: 20px;
         }
 
-        .section-title {
-            font-size: clamp(12px, 1.5vw, 18px);
-            color: #343E3D;
-            margin-bottom: 20px;
-            font-weight: normal;
+        .project-name {
+            margin-bottom: 8px;
         }
 
         .link-item {
             margin-bottom: 25px;
         }
 
-        .project-name {
-            font-size: clamp(12px, 1.5vw, 18px);
-            color: #343E3D;
-            margin-bottom: 8px;
-            font-weight: normal;
-        }
-
-        a {
-            color: #607466;
-            text-decoration: none;
-            transition: color 0.2s;
-            font-size: clamp(12px, 1.5vw, 18px);
-        }
-
-        a:hover {
-            color: #343E3D;
-        }
-
         .external-link {
             display: block;
+            width: fit-content;
+            font-size: var(--size-body);
             word-break: break-all;
             margin-bottom: 4px;
         }
 
-        /* Mobile styles */
         @media (max-width: 768px) {
-            .nav-item { font-size: 14px; }
-            #signature { font-size: 14px; }
-            .section-title { font-size: 14px; }
-            .project-name { font-size: 14px; }
-            a { font-size: 14px; }
+            body { padding: 60px 20px; }
         }
     </style>
 </head>
 <body>
+    <a class="skip-link" href="#main">skip to content</a>
+
     <!-- Navigation Pane -->
-    <nav id="nav-pane">
-        <a href="index.html" class="nav-item" data-key="1">1</a>
-        <a href="canvas.html" class="nav-item" data-key="2">2</a>
-        <a href="ux.html" class="nav-item" data-key="3">3</a>
-        <a href="links.html" class="nav-item active" data-key="4">4</a>
+    <nav id="nav-pane" aria-label="pages">
+        <a href="ux.html" class="nav-item" data-key="2" aria-keyshortcuts="2">design</a>
+        <a href="canvas.html" class="nav-item" data-key="3" aria-keyshortcuts="3">art</a>
+        <a href="links.html" class="nav-item active" data-key="4" aria-keyshortcuts="4" aria-current="page">press</a>
     </nav>
 
     <!-- Signature -->
-    <div id="signature">amanda sun</div>
+    <div id="signature"><a href="index.html" class="nav-item" data-key="1" aria-label="amanda sun: home" aria-keyshortcuts="1">amanda sun</a></div>
 
-    <div class="container">
+    <main id="main" class="container" tabindex="-1">
+        <h1 class="visually-hidden">press &amp; links</h1>
         <!-- Contact Section -->
         <div class="section">
-            <div class="section-title">contact</div>
-            <a href="https://www.linkedin.com/in/amandajsun" target="_blank" class="external-link">
-                linkedin.com/in/amandajsun
+            <h2 class="section-title">contact</h2>
+            <a href="https://www.linkedin.com/in/amandajsun" target="_blank" class="external-link text-link">
+                linkedin.com/in/amandajsun<span class="visually-hidden"> (opens in a new tab)</span>
             </a>
         </div>
 
         <!-- Press Section -->
         <div class="section">
-            <div class="section-title">press</div>
+            <h2 class="section-title">press</h2>
             <div class="link-item">
-                <div class="project-name">green2go</div>
-                <a href="https://web.archive.org/web/20221109172056/https://www.goodmorningamerica.com/gma3/video/climate-hero-dartmouth-student-expands-campus-reusable-container-92907941" target="_blank" class="external-link">
-                    good morning america
+                <h3 class="project-name">green2go</h3>
+                <a href="https://web.archive.org/web/20221109172056/https://www.goodmorningamerica.com/gma3/video/climate-hero-dartmouth-student-expands-campus-reusable-container-92907941" target="_blank" class="external-link text-link">
+                    good morning america<span class="visually-hidden"> (opens in a new tab)</span>
                 </a>
-                <a href="http://web.archive.org/web/20220427193629/https://foodprint.org/blog/fighting-plastic/" target="_blank" class="external-link">
-                    foodprint
+                <a href="http://web.archive.org/web/20220427193629/https://foodprint.org/blog/fighting-plastic/" target="_blank" class="external-link text-link">
+                    foodprint<span class="visually-hidden"> (opens in a new tab)</span>
                 </a>
-                <a href="https://web.archive.org/web/20230503190202/https://api.thecrimson.com/article/2022/2/3/student-dining-hall-waste/" target="_blank" class="external-link">
-                    harvard crimson
+                <a href="https://web.archive.org/web/20230503190202/https://api.thecrimson.com/article/2022/2/3/student-dining-hall-waste/" target="_blank" class="external-link text-link">
+                    harvard crimson<span class="visually-hidden"> (opens in a new tab)</span>
                 </a>
             </div>
 
-            <div class="section-title">awards, etc</div>
+            <h2 class="section-title">awards, etc</h2>
             <div class="link-item">
-                <a href="https://www.gsb.stanford.edu/" target="_blank" class="external-link">
-                    gsb deferred admit
+                <a href="https://www.gsb.stanford.edu/" target="_blank" class="external-link text-link">
+                    gsb deferred admit<span class="visually-hidden"> (opens in a new tab)</span>
                 </a>
-                <a href="https://www.kleinerperkins.com/" target="_blank" class="external-link">
-                    kleiner perkins fellow
+                <a href="https://www.kleinerperkins.com/" target="_blank" class="external-link text-link">
+                    kleiner perkins fellow<span class="visually-hidden"> (opens in a new tab)</span>
                 </a>
-                <a href="https://home.dartmouth.edu/news/2023/05/two-undergraduates-selected-udall-foundation-awards" target="_blank" class="external-link">
-                    udall scholar
+                <a href="https://home.dartmouth.edu/news/2023/05/two-undergraduates-selected-udall-foundation-awards" target="_blank" class="external-link text-link">
+                    udall scholar<span class="visually-hidden"> (opens in a new tab)</span>
                 </a>
-                <a href="https://www.walkingsofter.org/stories/checking-in-with-amanda-sun" target="_blank" class="external-link">
-                    walking softer young leader award
+                <a href="https://www.walkingsofter.org/stories/checking-in-with-amanda-sun" target="_blank" class="external-link text-link">
+                    walking softer young leader award<span class="visually-hidden"> (opens in a new tab)</span>
                 </a>
-                <a href="https://www.earthecho.org/" target="_blank" class="external-link">
-                    earth echo board emeritus
+                <a href="https://www.earthecho.org/" target="_blank" class="external-link text-link">
+                    earth echo board emeritus<span class="visually-hidden"> (opens in a new tab)</span>
                 </a>
             </div>
         </div>
-    </div>
+    </main>
 
-    <script>
-        document.addEventListener('keydown', (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-            document.querySelectorAll('.nav-item').forEach(item => {
-                if (item.dataset.key === e.key) window.location.href = item.href;
-            });
-        });
-    </script>
 </body>
 </html>

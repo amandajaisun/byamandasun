@@ -115,6 +115,11 @@ body {
     font-weight: var(--weight-regular);
     z-index: 100;
     line-height: 1;
+
+    /* "amanda sun" links home */
+    & a {
+        color: inherit;
+    }
 }
 
 /* Text links animate their weight on hover */

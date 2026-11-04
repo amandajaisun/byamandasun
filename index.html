@@ -3,123 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>amanda sun</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="site.js" defer></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            background: white;
-            font-family: 'DM Sans', sans-serif;
-            min-height: 100vh;
             overflow: hidden;
         }
 
-        /* Navigation */
-        #nav-pane {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            display: flex;
-            gap: 16px;
-            z-index: 100;
-            line-height: 1;
-        }
-        .nav-item {
-    text-decoration: none;
-    color: #607466;
-    font-size: clamp(14px, 2.5vw, 32px);
-    transition: color 0.2s;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-}
-
-#signature {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    color: #343E3D;
-    font-size: clamp(14px, 2.5vw, 32px);
-    font-family: 'DM Sans', sans-serif;
-    z-index: 100;
-    line-height: 1;
-}
-
-        .nav-item.active {
-            color: #343E3D;
+        main canvas {
+            display: block;
         }
 
         /* More info link */
         #more-info {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            color: #607466;
-            font-size: clamp(10px, 1vw, 14px);
-            font-family: 'DM Sans', sans-serif;
+            bottom: var(--gutter);
+            right: var(--gutter);
+            font-size: var(--size-small);
             z-index: 100;
-            text-decoration: none;
-            transition: color 0.2s;
         }
 
-        #more-info:hover {
-            color: #343E3D;
+        /* Wind slider: vertical, so it matches swiping up and down */
+        #wind-control {
+            position: fixed;
+            right: var(--gutter);
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            font-size: var(--size-small);
+            color: #767676;
         }
 
-        /* Mobile styles */
-        @media (max-width: 768px) {
-            .nav-item {
-                font-size: 14px;
+        /* A thin rounded bar that fills with the wind. --value is set from the
+           wind speed (0 to 1). The knob is invisible, but still what you drag */
+        #wind-speed {
+            --knob: 28px;
+            --value: 0;
+            --fill: calc(100% * var(--value));
+            -webkit-appearance: none;
+            appearance: none;
+            writing-mode: vertical-lr;
+            direction: rtl;
+            height: clamp(120px, 30vh, 240px);
+            width: var(--knob);
+            margin: 0;
+            background: none;
+            cursor: grab;
+
+            &:active {
+                cursor: grabbing;
             }
 
-            #signature {
-                font-size: 14px;
+            &::-webkit-slider-runnable-track {
+                width: 4px;
+                height: 100%;
+                border-radius: 2px;
+                background: linear-gradient(to top, var(--accent) var(--fill), rgb(120 120 128 / 0.24) var(--fill));
             }
 
-            #more-info {
-                font-size: 12px;
+            &::-moz-range-track {
+                width: 4px;
+                height: 100%;
+                border-radius: 2px;
+                background: linear-gradient(to top, var(--accent) var(--fill), rgb(120 120 128 / 0.24) var(--fill));
             }
+
+            &::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                width: var(--knob);
+                height: var(--knob);
+                margin-left: -12px; /* centers the knob on the 4px track */
+                background: transparent;
+            }
+
+            &::-moz-range-thumb {
+                width: var(--knob);
+                height: var(--knob);
+                border: none;
+                background: transparent;
+            }
+        }
+
+        #wind-output {
+            font-variant-numeric: tabular-nums;
+            line-height: 1.2;
+            text-align: center;
+            white-space: pre-line; /* the number, with "mph" on the line below */
+        }
+
+        /* Plain text, with its 4px padding keeping it level with the other bottom text */
+        #motion-toggle {
+            position: fixed;
+            bottom: calc(var(--gutter) - 4px);
+            left: var(--gutter);
+            z-index: 100;
+            padding: 4px 0;
+            border: none;
+            background: none;
+        }
+
+        /* Bottom center. Clicks pass through to the trees */
+        #new-tree-hint {
+            position: fixed;
+            bottom: var(--gutter);
+            left: 50%;
+            translate: -50% 0;
+            z-index: 100;
+            font-size: var(--size-small);
+            color: #767676; /* 4.5:1 on white (WCAG AA) */
+            white-space: nowrap;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
+    <a class="skip-link" href="#main">skip to content</a>
 
     <!-- Navigation Pane -->
-    <nav id="nav-pane">
-        <a href="index.html" class="nav-item active" data-key="1">1</a>
-        <a href="canvas.html" class="nav-item" data-key="2">2</a>
-        <a href="ux.html" class="nav-item" data-key="3">3</a>
-        <a href="links.html" class="nav-item" data-key="4">4</a>
+    <nav id="nav-pane" aria-label="pages">
+        <a href="ux.html" class="nav-item" data-key="2" aria-keyshortcuts="2">design</a>
+        <a href="canvas.html" class="nav-item" data-key="3" aria-keyshortcuts="3">art</a>
+        <a href="links.html" class="nav-item" data-key="4" aria-keyshortcuts="4">press</a>
     </nav>
 
     <!-- Signature -->
-    <div id="signature">amanda sun</div>
+    <h1 id="signature"><a href="index.html" class="nav-item" data-key="1" aria-label="amanda sun: home" aria-keyshortcuts="1" aria-current="page">amanda sun</a></h1>
+
+    <main id="main" tabindex="-1">
+        <p class="visually-hidden">
+            A generative drawing of two trees whose branches and leaves sway in the wind.
+            Press space or tap to grow new trees. Use the wind slider, or swipe up and down, to change the wind.
+        </p>
+    </main>
+
+    <div id="wind-control">
+        <label for="wind-speed" class="visually-hidden">wind speed</label>
+        <input id="wind-speed" type="range" min="0" max="30" step="1" value="4" aria-valuetext="4 mph">
+        <output id="wind-output" for="wind-speed">4 mph</output>
+    </div>
+
+    <button id="motion-toggle" class="motion-toggle" type="button" aria-pressed="false">pause</button>
+
+    <p id="new-tree-hint"></p>
 
     <!-- More info link -->
-    <a id="more-info" href="http://byamandasun.com/code/billington" target="_blank">for more info</a>
+    <a id="more-info" class="text-link" href="billington.html" target="_blank">for more info<span class="visually-hidden"> about the tree sketch (opens in a new tab)</span></a>
 
     <script>
-        // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                if (item.dataset.key === e.key) {
-                    window.location.href = item.href;
-                }
-            });
-        });
-    </script>
-
-    <script>
-        let smoothedWind = 0;
         let transparency = 150;
         let leafColor, branchColor, skyColor;
 
@@ -134,15 +173,11 @@
         let minLength, maxLength, minWidth, maxWidth;
         let maxBranchSizeForLeaves, leafSpawnOdds;
         let branches = [];
-        let pauseWind = false;
         let drawWind = false;
         let drawLeaves = true;
 
         // Wind variables
         let windDirection, windVelocity;
-        let velIncrement, velOff = 0;
-        let windspeedIncrement, windspeed = 0;
-        let limit = 2.1;
 
         // Leaf outline
         let nLeafPoints = 12;
@@ -151,7 +186,9 @@
 
         function setup() {
             let cnv = createCanvas(windowWidth, windowHeight);
-            cnv.parent(document.body);
+            cnv.parent('main');
+            // Described for screen readers by the text in <main>
+            cnv.elt.setAttribute('aria-hidden', 'true');
 
             frameRate(30);
             leafColor = color(100, 100, 100, 240);
@@ -161,23 +198,55 @@
             initializeTreeValues();
             windDirection = 0;
             windVelocity = 0;
-            velIncrement = random(0.01, 0.1);
-            windspeedIncrement = random(0.1, 0.5);
             defineLeafOutline();
             generateBranches();
             redrawTrees();
         }
 
+        // Wind speed comes from the slider (or swiping up/down on the trees)
+        const MPH_PER_UNIT = 4;
+        const windSlider = document.getElementById('wind-speed');
+        const windOutput = document.getElementById('wind-output');
+        let targetMph = Number(windSlider.value);
+
+        function setWindMph(mph) {
+            targetMph = Math.min(Math.max(Math.round(mph), Number(windSlider.min)), Number(windSlider.max));
+            windSlider.value = targetMph;
+            windOutput.textContent = targetMph + '\nmph';
+            windSlider.setAttribute('aria-valuetext', targetMph + ' mph');
+            windSlider.style.setProperty('--value', targetMph / Number(windSlider.max));
+        }
+        setWindMph(targetMph);
+        windSlider.addEventListener('input', () => setWindMph(Number(windSlider.value)));
+
+        // Trackpad swipe / scroll wheel: swiping up raises the wind
+        let wheelMph = targetMph;
+        window.addEventListener('wheel', (e) => {
+            if (e.target.closest('#wind-control, a, button')) return;
+            wheelMph = Math.min(Math.max(wheelMph + e.deltaY / 40, 0), Number(windSlider.max));
+            if (Math.round(wheelMph) !== targetMph) setWindMph(wheelMph);
+        }, { passive: true });
+        windSlider.addEventListener('input', () => { wheelMph = targetMph; });
+
+        // Pause button (WCAG 2.2.2); starts paused if the system asks for reduced motion
+        let motionPaused = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const motionToggle = document.getElementById('motion-toggle');
+
+        function setMotionPaused(paused) {
+            motionPaused = paused;
+            motionToggle.textContent = paused ? 'play' : 'pause';
+            motionToggle.setAttribute('aria-pressed', String(paused));
+        }
+        setMotionPaused(motionPaused);
+        motionToggle.addEventListener('click', () => setMotionPaused(!motionPaused));
+
         function draw() {
-            if (!pauseWind) {
+            if (!motionPaused) {
                 updateWind();
                 for (let i = 0; i < treeNumber; i++) branches[i].rotateDueToWind();
-                redrawTrees();
-                drawControlPanel();
-                if (drawWind) drawWindLine();
-            } else {
-                drawControlPanel();
             }
+            redrawTrees();
+            if (drawWind) drawWindLine();
         }
 
         function redrawTrees() {
@@ -211,23 +280,13 @@
             ellipse(dx, dy, 8, 8);
         }
 
-        function drawControlPanel() {
-        // Smooth the wind value so it doesn't jump around
-        smoothedWind = lerp(smoothedWind, windVelocity * 4, 0.05);
-        
-        textAlign(RIGHT, TOP);
-        textFont('DM Sans');
-        let fontSize = height * 0.016;
-        textSize(fontSize);
-        fill(150);
-        let rightX = width - 20;
-        let y = 25 + height * 0.05;
-        text('tap or space to grow a new tree', rightX, y);
-        y += fontSize * 2;
-        text('wind: ' + smoothedWind.toFixed(1) + ' mph', rightX, y);
-    }
+        // Touchscreens without a mouse/trackpad (iPhone, iPad) get the tap hint
+        const touchOnly = window.matchMedia('(hover: none) and (pointer: coarse)');
+
+        document.getElementById('new-tree-hint').textContent =
+            touchOnly.matches ? 'tap for new tree' : 'hit space bar for new tree';
+
         function initializeTreeValues() {
-            pauseWind = false;
             drawWind = false;
             drawLeaves = true;
 
@@ -259,37 +318,56 @@
             redrawTrees();
         }
 
-        function touchStarted() {
-            if (touches.length > 0) {
-                const touchY = touches[0].y;
-                if (touchY < 60 || touchY > windowHeight - 60) return true;
+        const SWIPE_PX_PER_MPH = 12;
+        let touchStartY = null, touchStartMph = 0, swiping = false;
+
+        function onTrees(event) {
+            return event && event.target && event.target.tagName === 'CANVAS';
+        }
+
+        function touchStarted(event) {
+            if (!onTrees(event) || touches.length === 0) return true;
+            touchStartY = touches[0].y;
+            touchStartMph = targetMph;
+            swiping = false;
+            return false;
+        }
+
+        function touchMoved(event) {
+            if (touchStartY === null || touches.length === 0) return true;
+            const dy = touchStartY - touches[0].y; // up is positive
+            if (Math.abs(dy) > 10) swiping = true;
+            if (swiping) setWindMph(touchStartMph + dy / SWIPE_PX_PER_MPH);
+            return false;
+        }
+
+        function touchEnded(event) {
+            if (touchStartY === null) return true;
+            if (!swiping) {
                 generateBranches();
                 windDirection = random(TWO_PI);
                 redrawTrees();
-                return false;
             }
+            touchStartY = null;
+            return false;
         }
 
         function keyPressed() {
+            // Leave keys alone while a button or link has focus (space would press it)
+            if (document.activeElement && document.activeElement.closest('a, button, input')) return;
             if (key === ' ') { generateBranches(); windDirection = random(TWO_PI); redrawTrees(); }
-            if (keyCode === UP_ARROW && !pauseWind && windVelocity < 8) { windVelocity++; windspeed++; }
-            if (keyCode === DOWN_ARROW && !pauseWind && windVelocity > 0 && windspeed > 1) {
-                windVelocity += 0.5; windspeed -= 0.5;
-                if (windspeed < 0.5) pauseWind = !pauseWind;
-            }
+            if (keyCode === UP_ARROW) setWindMph(targetMph + 1);
+            if (keyCode === DOWN_ARROW) setWindMph(targetMph - 1);
             if (keyCode === LEFT_ARROW) windDirection = (windDirection - 0.1 + TWO_PI) % TWO_PI;
             if (keyCode === RIGHT_ARROW) windDirection = (windDirection + 0.1) % TWO_PI;
-            if (key === '1') window.location.href = 'index.html';
-            if (key === '2') window.location.href = 'canvas.html';
-            if (key === '3') window.location.href = 'ux.html';
-            if (key === '4') window.location.href = 'links.html';
             redrawTrees();
         }
 
         function keyTyped() {
+            if (document.activeElement && document.activeElement.closest('a, button, input')) return;
             if (key === 'm') drawWind = !drawWind;
             if (key === 'l') drawLeaves = !drawLeaves;
-            if (key === 'p') { pauseWind = !pauseWind; if (pauseWind) windVelocity = 0; }
+            if (key === 'p') motionToggle.click();
             if (key === '=' && transparency < 240) { transparency += 10; leafColor = color(100, 100, 100, transparency); }
             if (key === '-' && transparency > 0) { transparency -= 10; leafColor = color(100, 100, 100, transparency); }
             redrawTrees();
@@ -449,11 +527,9 @@
         }
 
         function updateWind() {
-            velOff += velIncrement;
-            windspeed += windspeedIncrement;
             windDirection = (windDirection - 0.001 + TWO_PI) % TWO_PI;
-            if (windspeed >= limit) windspeed -= windspeedIncrement;
-            windVelocity = windspeed * noise(velOff) - 1;
+            // Ease toward the chosen speed so changes feel like a gust, not a jump
+            windVelocity = lerp(windVelocity, targetMph / MPH_PER_UNIT, 0.05);
         }
     </script>
 </body>

@@ -8,122 +8,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="project.css">
     <script src="site.js" defer></script>
+    <script src="project.js" defer></script>
     <style>
         :root {
             --editor-blue: #2f6feb;
-        }
-
-        body {
-            overflow-x: clip;
-            padding: 100px 40px 60px;
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        h1, h2, h3 {
-            font-weight: var(--weight-regular);
-        }
-
-        section {
-            margin-bottom: 64px;
-        }
-
-        /* Hero: date line, title and next link, then the project details */
-        .hero {
-            margin-bottom: 64px;
-        }
-
-        /* Company and title on the left, project links on the right */
-        .hero-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            gap: 24px;
-        }
-
-        .dateline,
-        .project-links {
-            font-size: clamp(14px, 1.8vw, 22px);
-        }
-
-        .dateline {
-            margin-bottom: 4px;
-        }
-
-        /* Columns keep the word "project" lined up across both links */
-        .project-links {
-            display: grid;
-            grid-template-columns: auto auto auto;
-            column-gap: 0.3em;
-            row-gap: 4px;
-            flex-shrink: 0;
-
-            & a {
-                display: grid;
-                grid-template-columns: subgrid;
-                grid-column: 1 / -1;
-            }
-
-            & .link-start {
-                justify-self: end;
-            }
-        }
-
-        .hero h1 {
-            font-size: clamp(32px, 6vw, 66px);
-            line-height: 1.1;
-            text-wrap: balance;
-            margin-bottom: 12px;
-        }
-
-        /* Stacked "Label: value" lines */
-        .details {
-            margin: 24px 0 56px;
-            font-size: clamp(13px, 1.4vw, 18px);
-            line-height: 1.3;
-            color: var(--accent);
-
-            & dt,
-            & dd {
-                display: inline;
-            }
-        }
-
-        .prose {
-            max-width: 60ch;
-
-            & h2 {
-                font-size: clamp(20px, 2.6vw, 32px);
-                margin-bottom: 20px;
-            }
-
-            & h3 {
-                font-size: clamp(16px, 2vw, 24px);
-                margin: 40px 0 12px;
-            }
-
-            & p {
-                font-size: clamp(13px, 1.4vw, 18px);
-                font-weight: 300;
-                line-height: 1.6;
-                text-wrap: pretty;
-            }
-
-            & p + p {
-                margin-top: 16px;
-            }
-        }
-
-        .quote {
-            margin-bottom: 24px;
-            font-size: clamp(16px, 2vw, 24px);
-            font-style: italic;
-            line-height: 1.35;
-            text-wrap: pretty;
         }
 
         /* Examples of blocks: images fit a same-sized frame so captions line up */
@@ -151,7 +41,7 @@
                 margin: auto;
                 max-width: 100%;
                 max-height: 100%;
-                border-radius: 10px;
+                border-radius: var(--media-radius);
             }
         }
 
@@ -202,7 +92,7 @@
 
         .block-photo {
             position: absolute;
-            border-radius: 10px;
+            border-radius: var(--media-radius);
             width: clamp(90px, 14vw, 180px);
             aspect-ratio: 3 / 4;
             object-fit: cover;
@@ -309,7 +199,7 @@
             position: absolute;
             inset: 0;
             overflow: hidden;
-            border-radius: 10px;
+            border-radius: var(--media-radius);
         }
 
         .band {
@@ -344,7 +234,7 @@
 
         .block {
             position: absolute;
-            border-radius: 10px;
+            border-radius: var(--media-radius);
             cursor: grab;
             touch-action: pan-y;
             display: flex;
@@ -536,72 +426,14 @@
         }
 
         /* The final product: two recordings that play while hovered */
-        .final {
-            & h2 {
-                font-size: clamp(20px, 2.6vw, 32px);
-                margin-bottom: 20px;
-            }
-        }
-
-        .final-note {
-            margin-bottom: 32px;
-            font-size: clamp(13px, 1.4vw, 18px);
-            font-weight: 300;
-            line-height: 1.6;
-
-            & a {
-                text-decoration: underline;
-                text-underline-offset: 3px;
-            }
-        }
-
         .final-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 24px;
-
-            & video {
-                width: 100%;
-                height: auto;
-                display: block;
-                border-radius: 10px;
-                -webkit-tap-highlight-color: transparent;
-            }
-        }
-
-        /* Shows what a click does: play while stopped, pause while playing */
-        .clip {
-            position: relative;
-        }
-
-        .state-icon {
-            position: absolute;
-            right: 14px;
-            bottom: 14px;
-            width: 22px;
-            height: 22px;
-            fill: var(--ink);
-            pointer-events: none;
-        }
-
-        .pause-shape,
-        .clip.playing .play-shape {
-            display: none;
-        }
-
-        .clip.playing .pause-shape {
-            display: block;
-        }
-
-        .outcome {
-            margin-bottom: 0;
+            margin-top: 32px;
         }
 
         @media (max-width: 768px) {
-            body { padding: 80px 20px 40px; }
-            section { margin-bottom: 48px; }
-            .hero { margin-bottom: 48px; }
-            .details { margin: 20px 0 40px; }
             .step-copy { min-height: 124px; }
             .blocks { height: 360px; }
             .block-photo { width: 80px; }
@@ -615,14 +447,13 @@
 
     <!-- Navigation Pane -->
     <nav id="nav-pane" aria-label="pages">
-        <a href="index.html" class="nav-item" data-key="1" aria-label="1: home">1</a>
-        <a href="canvas.html" class="nav-item" data-key="2" aria-label="2: canvas">2</a>
-        <a href="ux.html" class="nav-item active" data-key="3" aria-label="3: ux/ui">3</a>
-        <a href="links.html" class="nav-item" data-key="4" aria-label="4: press and links">4</a>
+        <a href="ux.html" class="nav-item active" data-key="2" aria-keyshortcuts="2">design</a>
+        <a href="canvas.html" class="nav-item" data-key="3" aria-keyshortcuts="3">art</a>
+        <a href="links.html" class="nav-item" data-key="4" aria-keyshortcuts="4">press</a>
     </nav>
 
     <!-- Signature -->
-    <div id="signature">amanda sun</div>
+    <div id="signature"><a href="index.html" class="nav-item" data-key="1" aria-label="amanda sun: home" aria-keyshortcuts="1">amanda sun</a></div>
 
     <main id="main" class="container" tabindex="-1">
         <section class="blocks" id="blocks">
@@ -649,7 +480,7 @@
                 </div>
                 <div class="project-links">
                     <a class="text-link" href="billington.html"><span class="link-start">next</span> <span>project</span> <span>→</span></a>
-                    <a class="text-link" href="caltrain.html"><span class="link-start">← previous</span> <span>project</span></a>
+                    <a class="text-link" href="caltrain.html"><span class="link-start">← prev</span> <span>project</span></a>
                 </div>
             </div>
             <dl class="details">
@@ -749,25 +580,21 @@
         </section>
 
         <section class="final">
-            <h2>The Final Product</h2>
-            <p class="final-note">Find more info <a class="text-link" href="https://support.squarespace.com/hc/en-us/articles/206543627-Duplicating-pages-and-content?platform=v6&amp;websiteId=630695821979201073ae342a#h_01HKNG2V56WXTRTGVTQSS005YH" target="_blank">here<span class="visually-hidden"> (opens in a new tab)</span></a>.</p>
+            <div class="prose">
+                <h2>The Final Product</h2>
+                <p>Find more info <a class="text-link" href="https://support.squarespace.com/hc/en-us/articles/206543627-Duplicating-pages-and-content?platform=v6&amp;websiteId=630695821979201073ae342a#h_01HKNG2V56WXTRTGVTQSS005YH" target="_blank">here<span class="visually-hidden"> (opens in a new tab)</span></a>.</p>
+            </div>
             <div class="final-grid">
-                <div class="clip">
-                    <video src="imgs/squarespace/duplication.mp4" poster="imgs/squarespace/duplication-poster.jpg"
-                           loop muted playsinline preload="metadata" tabindex="0" data-no-pause-button data-hover-play
-                           aria-label="duplicating an image block in the squarespace editor"></video>
-                    <svg class="state-icon" viewBox="0 0 24 24" aria-hidden="true"><path class="pause-shape" d="M7 4h4v16H7zM13 4h4v16h-4z"/><path class="play-shape" d="M7 4l13 8-13 8z"/></svg>
-                </div>
-                <div class="clip">
-                    <video src="imgs/squarespace/multiselect.mp4" poster="imgs/squarespace/multiselect-poster.jpg"
-                           loop muted playsinline preload="metadata" tabindex="0" data-no-pause-button data-hover-play
-                           aria-label="selecting several text blocks and duplicating them together"></video>
-                    <svg class="state-icon" viewBox="0 0 24 24" aria-hidden="true"><path class="pause-shape" d="M7 4h4v16H7zM13 4h4v16h-4z"/><path class="play-shape" d="M7 4l13 8-13 8z"/></svg>
-                </div>
+                <video src="imgs/squarespace/duplication.mp4" poster="imgs/squarespace/duplication-poster.jpg"
+                       loop muted playsinline preload="metadata" data-no-pause-button data-hover-play
+                       aria-label="duplicating an image block in the squarespace editor"></video>
+                <video src="imgs/squarespace/multiselect.mp4" poster="imgs/squarespace/multiselect-poster.jpg"
+                       loop muted playsinline preload="metadata" data-no-pause-button data-hover-play
+                       aria-label="selecting several text blocks and duplicating them together"></video>
             </div>
         </section>
 
-        <section class="prose outcome">
+        <section class="prose">
             <h2>Outcome</h2>
             <p>Block Duplication shipped to 3.8 million Squarespace users!</p>
             <p>This work also set the team up for section duplication, which is now also available for users.</p>
@@ -789,27 +616,6 @@
                 play();
             }
         })();
-
-        // Final product videos stay paused until hovered or keyboard focused. On
-        // touch, tapping plays and pauses them (site.js handles clicks). Either
-        // way, they stop once they scroll off screen.
-        const offScreen = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                if (!entry.isIntersecting) entry.target.pause();
-            });
-        });
-
-        document.querySelectorAll('[data-hover-play]').forEach((video) => {
-            const play = () => video.play().catch(() => {});
-            const clip = video.closest('.clip');
-            video.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') play(); });
-            video.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') video.pause(); });
-            video.addEventListener('focus', () => { if (video.matches(':focus-visible')) play(); });
-            video.addEventListener('blur', () => video.pause());
-            video.addEventListener('play', () => clip.classList.add('playing'));
-            video.addEventListener('pause', () => clip.classList.remove('playing'));
-            offScreen.observe(video);
-        });
 
         // Sandbox: a small recreation of block duplication in the editor.
         // Positions are in design units, with y relative to the block's section.
