@@ -72,17 +72,21 @@
 
         .line {
             grid-area: 1 / 1;
-            transition: opacity 0.5s ease, translate 0.5s ease;
+            /* Returning to the top: the "duplicated" line clears before this one
+               arrives, so the two don't sit on top of each other */
+            transition: opacity 0.6s ease 0.25s, translate 0.6s ease 0.25s;
 
             &.after {
                 opacity: 0;
                 translate: 0 12px;
+                transition: opacity 0.4s ease, translate 0.4s ease;
             }
         }
 
         .blocks.duplicated .line {
             opacity: 0;
             translate: 0 -12px;
+            transition: opacity 0.5s ease, translate 0.5s ease;
 
             &.after {
                 opacity: 1;
@@ -100,39 +104,46 @@
             top: var(--y);
         }
 
+        /* Transitions rather than keyframes, so the copies also slide back
+           when the reader returns to the top of the page. Going back they run in
+           reverse order, and stay solid until they're tucked behind their originals */
         .block-photo.copy {
+            --return-delay: calc((3 - var(--i)) * 120ms);
             opacity: 0;
             outline: 2px solid transparent;
+            transition:
+                translate 0.7s ease-in-out var(--return-delay),
+                opacity 0.15s linear calc(var(--return-delay) + 0.7s);
         }
 
         .blocks.duplicated .block-photo.copy {
-            animation: duplicate-block 1.2s ease both;
+            opacity: 1;
+            translate: var(--shift) var(--shift);
+            transition: opacity 0.4s ease, translate 0.66s ease;
+            transition-delay: calc(var(--i) * 180ms + 200ms);
+            animation: copy-selected 1.2s ease both;
             animation-delay: calc(var(--i) * 180ms + 200ms);
         }
 
-        @keyframes duplicate-block {
-            0% {
-                opacity: 0;
-                translate: 0 0;
-                outline-color: var(--editor-blue);
-            }
-            15% {
-                opacity: 1;
-            }
-            55%, 80% {
-                opacity: 1;
-                translate: var(--shift) var(--shift);
+        /* Selected like a new copy in the editor, then deselected */
+        @keyframes copy-selected {
+            0%, 80% {
                 outline-color: var(--editor-blue);
             }
             100% {
-                opacity: 1;
-                translate: var(--shift) var(--shift);
                 outline-color: transparent;
             }
         }
 
         @media (prefers-reduced-motion: reduce) {
+            .line,
+            .line.after,
+            .block-photo.copy {
+                transition-delay: 0ms;
+            }
+
             .blocks.duplicated .block-photo.copy {
+                transition-delay: 0ms;
                 animation-delay: 0ms;
             }
         }
@@ -602,19 +613,19 @@
     </main>
 
     <script>
-        // Opening: hold on "These are all blocks", then duplicate. Waits until
-        // the page is actually being viewed, since hovering a link prerenders it.
+        // Opening: scrolling past 5% of this section duplicates the blocks, and
+        // only returning to the very top of the page (or overscrolling it) undoes it.
         (() => {
-            const HOLD = 1800;
+            const TRIGGER = 0.05;
             const blocks = document.getElementById('blocks');
-            const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-            const play = () => setTimeout(() => blocks.classList.add('duplicated'), reduceMotion ? 0 : HOLD);
 
-            if (document.prerendering) {
-                document.addEventListener('prerenderingchange', play, { once: true });
-            } else {
-                play();
-            }
+            const update = () => {
+                if (window.scrollY <= blocks.offsetHeight * .01) blocks.classList.remove('duplicated');
+                else if (window.scrollY > blocks.offsetHeight * TRIGGER) blocks.classList.add('duplicated');
+            };
+
+            window.addEventListener('scroll', update, { passive: true });
+            update(); // the page may load already scrolled down
         })();
 
         // Sandbox: a small recreation of block duplication in the editor.
@@ -645,7 +656,7 @@
             const steps = [
                 {
                     title: 'Copying on the left side',
-                    text: 'On the left side of a site, a copy lands offset to the bottom right of the original.',
+                    text: 'On the left side of a site, a copy lands to the bottom right of the original.',
                     hint: 'Press duplicate to see where the copy lands. You can drag the photo, too.',
                     sections: 1,
                     wide: [{ type: 'image', section: 0, x: 120, y: 120, w: 144, h: 192, src: 'block-1.jpg' }],
@@ -653,7 +664,7 @@
                 },
                 {
                     title: 'Copying on the right side',
-                    text: 'At the right edge of a site, that offset made copying difficult, so we changed it: the copy goes straight down.',
+                    text: 'At the right edge of a site, that offset direction is impossible, so in this case, the copy goes straight down.',
                     hint: 'Press duplicate to see where the copy lands.',
                     sections: 1,
                     wide: [{ type: 'image', section: 0, x: 840, y: 120, w: 144, h: 192, src: 'block-1.jpg' }],
@@ -669,7 +680,7 @@
                 },
                 {
                     title: 'Copying at the bottom left',
-                    text: 'At the bottom left of a section, the copy goes to the bottom right, and the section gets slightly taller here too.',
+                    text: 'At the bottom left of a section, the copy goes to the bottom right, and the section lengthens to accomodate.',
                     hint: 'Press duplicate to see the section grow.',
                     sections: 1,
                     wide: [{ type: 'image', section: 0, x: 120, y: 288, w: 144, h: 192, src: 'block-1.jpg' }],
@@ -692,7 +703,7 @@
                 },
                 {
                     title: 'Selecting something that isn’t copyable',
-                    text: 'Duplicating is disabled here too, including in multiselect.',
+                    text: 'Duplicating is disabled here, including in multiselect.',
                     hint: 'This selection includes a block that can’t be copied, so duplicate is disabled.',
                     sections: 1,
                     wide: [
