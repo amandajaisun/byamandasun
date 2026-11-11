@@ -45,11 +45,19 @@
     
     <div class="caltrain-opening project-opening container">
         <div class="opening-phone">
-            <img class="screen" src="imgs/caltrain/final-onboarding.webp" alt="the caltrain app's onboarding: a map of the caltrain line asking where are you heading, with san jose diridon selected">
+            <img class="screen" src="imgs/caltrain/opening-onboarding.webp" alt="the caltrain app's onboarding: a map of the caltrain line asking where are you heading, with mountain view selected">
             <img class="bezel" src="imgs/caltrain/bezel.png" loading="lazy" alt="">
         </div>
         <div class="opening-phone">
-            <img class="screen" src="imgs/caltrain/final-timetable.webp" loading="lazy" alt="the caltrain app showing weekday times from san francisco to san jose diridon, with trains that have already left striped">
+            <img class="screen" src="imgs/caltrain/opening-timetable.webp" loading="lazy" alt="the caltrain app showing weekday times from san francisco to mountain view, with limited and express trains highlighted">
+            <img class="bezel" src="imgs/caltrain/bezel.png" loading="lazy" alt="">
+        </div>
+        <div class="opening-phone">
+            <img class="screen" src="imgs/caltrain/opening-homewidget.webp" loading="lazy" alt="iphone home screen with a caltrain widget listing the next trains from mountain view to san francisco, and the dynamic island showing the 11:16 train">
+            <img class="bezel" src="imgs/caltrain/bezel.png" loading="lazy" alt="">
+        </div>
+        <div class="opening-phone">
+            <img class="screen" src="imgs/caltrain/opening-lockscreen.webp" loading="lazy" alt="iphone lock screen with a caltrain live activity: the 11:16am train from mountain view to san francisco, arriving at 12:16pm, leaves in 43:53">
             <img class="bezel" src="imgs/caltrain/bezel.png" loading="lazy" alt="">
         </div>
     </div>
@@ -213,7 +221,7 @@
             <h3>Feedback 2: Progressive disclosure</h3>
             <p>I received feedback that a user had to process more than necessary on the timetable page. For example, do we really need the local, limited, and express pills constantly toggled? Also, weekend and weekday could be simplified.</p>
         </div>
-        <div class="qa">
+        <div class="qa match-height" style="--cols: 526fr 846fr">
             <figure>
                 <img class="phone" src="imgs/caltrain/pd-limited.webp" loading="lazy" alt="schedule with local, limited and express filter buttons">
                 <figcaption>Do we need the limited buttons?</figcaption>
@@ -223,7 +231,7 @@
                 <figcaption>Not really.</figcaption>
             </figure>
         </div>
-        <div class="qa">
+        <div class="qa match-height keep-row" style="--cols: 1017fr 497fr">
             <figure>
                 <img src="imgs/caltrain/pd-toggle.webp" loading="lazy" alt="schedule with and without the weekday/weekend toggle">
                 <figcaption>And the weekday/weekend toggle?</figcaption>
@@ -277,10 +285,11 @@
         margin-bottom: 0;
     }
 
-    /* The phones sit side by side, as tall as the opening allows while both
-       still fit across it, and rise in one after the other as the page loads */
+    /* The four phones sit side by side, as tall as the opening allows while
+       all four still fit across it, and rise in one after the other as the
+       page loads. On phones they wrap into a 2×2 grid instead. */
     .caltrain-opening {
-        --gap: clamp(16px, 4vw, 64px);
+        --gap: clamp(12px, 3vw, 48px);
         container-type: size;
         display: flex;
         justify-content: center;
@@ -290,19 +299,20 @@
 
     .opening-phone {
         position: relative;
-        width: min(100cqh * 450 / 920, (100cqw - var(--gap)) / 2);
+        width: min(100cqh * 450 / 920, (100cqw - 3 * var(--gap)) / 4);
         aspect-ratio: 450 / 920;
         animation: phone-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 
-        & + .opening-phone {
-            animation-delay: 0.15s;
-        }
+        &:nth-child(2) { animation-delay: 0.1s; }
+        &:nth-child(3) { animation-delay: 0.2s; }
+        &:nth-child(4) { animation-delay: 0.3s; }
 
         & img {
             position: absolute;
             display: block;
         }
 
+        /* Same screen inset as the .device phones further down */
         & .screen {
             left: 5.333%;
             top: 2.5%;
@@ -316,6 +326,19 @@
             inset: 0;
             width: 100%;
             height: 100%;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .caltrain-opening {
+            container-type: inline-size;
+            height: auto;
+            flex-wrap: wrap;
+            gap: 24px 16px;
+        }
+
+        .opening-phone {
+            width: min(170px, (100cqw - 16px) / 2);
         }
     }
 
@@ -456,6 +479,23 @@
         margin-top: 40px;
     }
 
+    /* Same-height pair: both images come out the same height, so phones
+       drawn at the same scale in each file come out the same size. --cols
+       sizes each column by its image's width-to-height ratio, so filling
+       the column width gives every image in the row the same height. */
+    .qa.match-height {
+        grid-template-columns: var(--cols);
+
+        & img, & img.phone {
+            width: 100%;
+            max-width: none;
+            height: auto;
+            max-height: 480px;
+            object-fit: contain;
+            margin: 0;
+        }
+    }
+
     .step-note {
         margin-top: 40px;
     }
@@ -474,6 +514,12 @@
         .device { max-width: 300px; margin: 0 auto; }
         .pair, .qa { grid-template-columns: 1fr; gap: 24px; }
         .case figure img.phone { max-height: 440px; }
+        .qa.match-height {
+            grid-template-columns: 1fr;
+            & img, & img.phone { max-height: 440px; }
+        }
+        /* Stacking would size these two very differently, so keep them side by side */
+        .qa.match-height.keep-row { grid-template-columns: var(--cols); gap: 16px; }
     }
 </style>
 </body>
