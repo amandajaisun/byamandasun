@@ -3,7 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>canvas — amanda sun</title>
+    <title>art — amanda sun</title>
+    <meta name="description" content="Illustration, animation and object work by Amanda Sun.">
+    <link rel="canonical" href="https://byamandasun.com/canvas.html">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <!-- Sharing preview -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="amanda sun">
+    <meta property="og:title" content="Art — Amanda Sun">
+    <meta property="og:description" content="Illustration, animation and object work by Amanda Sun.">
+    <meta property="og:url" content="https://byamandasun.com/canvas.html">
+    <meta property="og:image" content="https://byamandasun.com/imgs/share/site.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
@@ -194,7 +208,7 @@
     <a class="skip-link" href="#main">skip to content</a>
 
     <main id="main" tabindex="-1">
-        <h1 class="visually-hidden">canvas</h1>
+        <h1 class="visually-hidden">art</h1>
         <p class="visually-hidden">Illustration, animation and object work. Drag to move around; select an image to see it larger.</p>
         <div id="canvas-container">
             <div id="canvas"></div>
@@ -203,7 +217,7 @@
 
     <!-- Zoom overlay -->
     <div id="zoom-overlay" role="dialog" aria-modal="true" aria-label="enlarged image">
-        <img id="zoom-image" src="" alt="">
+        <img id="zoom-image" alt="">
         <div id="zoom-caption"></div>
     </div>
 
@@ -218,7 +232,7 @@
     <nav id="nav-pane" aria-label="pages">
         <a href="ux.html" class="nav-item" data-key="2" aria-keyshortcuts="2">design</a>
         <a href="canvas.html" class="nav-item active" data-key="3" aria-keyshortcuts="3" aria-current="page">art</a>
-        <a href="links.html" class="nav-item" data-key="4" aria-keyshortcuts="4">press</a>
+        <a href="links.html" class="nav-item" data-key="4" aria-keyshortcuts="4">about</a>
     </nav>
 
     <!-- Signature -->
@@ -251,18 +265,43 @@
         let currentZoomIndex = -1;
         let isMobile = window.innerWidth <= 768;
 
-        function getRandomPosition(index, total) {
-            const canvasSize = 4000;
-            const angle = (index / total) * Math.PI * 2;
-            const radius = 600 + Math.random() * 800;
-            return {
-                x: canvasSize / 2 + Math.cos(angle) * radius + (Math.random() - 0.5) * 400,
-                y: canvasSize / 2 + Math.sin(angle) * radius + (Math.random() - 0.5) * 400
-            };
+        // Minimum empty space between any two images, in canvas px
+        const GAP = 60;
+        const placedRects = [];
+
+        function overlapsPlaced(r) {
+            return placedRects.some(p =>
+                r.x < p.x + p.w + GAP && r.x + r.w + GAP > p.x &&
+                r.y < p.y + p.h + GAP && r.y + r.h + GAP > p.y
+            );
+        }
+
+        // Scatter items around the canvas centre, packed fairly tight so the
+        // fit-to-screen zoom can stay close in. Each candidate spot is checked
+        // against everything already placed; if it collides we try again a
+        // little further out, so a free spot is always found.
+        function placeItem(index, total, w, h) {
+            const center = 2000;
+            const slice = (Math.PI * 2) / total;
+            const baseAngle = index * slice;
+            for (let attempt = 0; ; attempt++) {
+                const angle = baseAngle + (Math.random() - 0.5) * slice;
+                const radius = 100 + attempt * 8 + Math.random() * 250;
+                const rect = {
+                    // Wider than tall, to match a landscape screen
+                    x: center + Math.cos(angle) * radius * 1.6 - w / 2,
+                    y: center + Math.sin(angle) * radius - h / 2,
+                    w, h
+                };
+                if (!overlapsPlaced(rect)) {
+                    placedRects.push(rect);
+                    return rect;
+                }
+            }
         }
 
         images.forEach((img, index) => {
-            const pos = getRandomPosition(index, images.length);
+            const pos = placeItem(index, images.length, img.width * ITEM_SCALE, img.height * ITEM_SCALE);
             const imageEl = document.createElement('button');
             imageEl.type = 'button';
             imageEl.className = 'image-item';
@@ -344,7 +383,7 @@
             escapeHint.classList.remove('visible');
             prevArrow.classList.remove('visible');
             nextArrow.classList.remove('visible');
-            zoomImage.src = '';
+            zoomImage.removeAttribute('src');
             zoomCaption.textContent = '';
             const wasOpen = currentZoomIndex >= 0;
             currentZoomIndex = -1;
