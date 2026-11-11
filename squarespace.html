@@ -3,7 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>block duplication — amanda sun</title>
+    <title>Block Duplication — amanda sun</title>
+    <meta name="description" content="Designing the edge cases for duplicating blocks in the Squarespace editor, shipped to 3.8 million users.">
+    <link rel="canonical" href="https://byamandasun.com/squarespace.html">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <!-- Sharing preview -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="amanda sun">
+    <meta property="og:title" content="Block Duplication — Amanda Sun">
+    <meta property="og:description" content="Designing the edge cases for duplicating blocks in the Squarespace editor, shipped to 3.8 million users.">
+    <meta property="og:url" content="https://byamandasun.com/squarespace.html">
+    <meta property="og:image" content="https://byamandasun.com/imgs/share/block-duplication.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
@@ -51,13 +65,7 @@
         .blocks {
             --shift: clamp(14px, 2.2vw, 28px);
             position: relative;
-            /* Roomy, but the whole opening still fits in the window */
-            height: clamp(480px, min(62vw, calc(100vh - 140px)), 800px);
-            max-width: 1280px;
-            margin-bottom: clamp(96px, 12vw, 160px);
             isolation: isolate;
-            display: grid;
-            place-items: center;
         }
 
         .blocks-text {
@@ -449,7 +457,6 @@
 
         @media (max-width: 768px) {
             .step-copy { min-height: 124px; }
-            .blocks { height: 440px; margin-bottom: 64px; }
             .block-photo { width: 80px; }
             .final-grid { grid-template-columns: 1fr; }
             .block-examples { grid-template-columns: 1fr 1fr; }
@@ -463,14 +470,14 @@
     <nav id="nav-pane" aria-label="pages">
         <a href="ux.html" class="nav-item active" data-key="2" aria-keyshortcuts="2">design</a>
         <a href="canvas.html" class="nav-item" data-key="3" aria-keyshortcuts="3">art</a>
-        <a href="links.html" class="nav-item" data-key="4" aria-keyshortcuts="4">press</a>
+        <a href="links.html" class="nav-item" data-key="4" aria-keyshortcuts="4">about</a>
     </nav>
 
     <!-- Signature -->
     <div id="signature"><a href="wind.html" class="nav-item" data-key="1" aria-label="amanda sun: home" aria-keyshortcuts="1">amanda sun</a></div>
 
     <main id="main" tabindex="-1">
-        <section class="blocks container" id="blocks">
+        <section class="blocks project-opening container" id="blocks">
             <p class="visually-hidden">These are all blocks. They can be duplicated.</p>
             <div class="blocks-text" aria-hidden="true">
                 <p class="line"><span>↑ These are all →</span><span>← Blocks ↓</span></p>
@@ -513,7 +520,7 @@
             </dl>
             <section class="prose">
                 <h2>Overview</h2>
-                <p>Editing is at the heart of the Squarespace customer experience. However, a native copy-paste feature doesn't exist. Our team tackled this under a project called Block Duplication.</p>
+                <p>Editing is at the heart of the Squarespace customer experience. However, a native copy-paste feature didn’t exist. Our team tackled this under a project called Block Duplication.</p>
                 <p>I produced the duplication API, and was heavily involved in the design handoff. Illustrated below in the sandbox are the edge cases I brought up during this process.</p>
             </section>
 
@@ -594,7 +601,7 @@
         <section class="final">
             <div class="prose">
                 <h2>The Final Product</h2>
-                <p>Find more info <a class="text-link" href="https://support.squarespace.com/hc/en-us/articles/206543627-Duplicating-pages-and-content?platform=v6&amp;websiteId=630695821979201073ae342a#h_01HKNG2V56WXTRTGVTQSS005YH" target="_blank">here<span class="visually-hidden"> (opens in a new tab)</span></a>.</p>
+                <p>Read <a class="text-link" href="https://support.squarespace.com/hc/en-us/articles/206543627-Duplicating-pages-and-content#h_01HKNG2V56WXTRTGVTQSS005YH" target="_blank">Squarespace’s help article on duplicating blocks<span class="visually-hidden"> (opens in a new tab)</span></a>.</p>
             </div>
             <div class="final-grid">
                 <video src="imgs/squarespace/duplication.mp4" poster="imgs/squarespace/duplication-poster.jpg"
@@ -604,6 +611,7 @@
                        loop muted playsinline preload="metadata" data-no-pause-button data-hover-play
                        aria-label="selecting several text blocks and duplicating them together"></video>
             </div>
+            <p class="play-hint" data-play-hint>Hover to play</p>
         </section>
 
         <section class="prose">
@@ -618,17 +626,64 @@
     <script>
         // Opening: scrolling past 5% of this section duplicates the blocks, and
         // only returning to the very top of the page (or overscrolling it) undoes it.
+        // While the copies slide out, the page only scrolls a little further
+        // (SLACK, a share of the opening's height), so it can't be skipped.
         (() => {
             const TRIGGER = 0.05;
+            const SLACK = 0.25;
             const blocks = document.getElementById('blocks');
+            const lastCopy = blocks.querySelector('.block-photo.copy:last-of-type');
+            const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const SCROLL_KEYS = new Set([' ', 'PageDown', 'PageUp', 'ArrowDown', 'ArrowUp', 'End', 'Home']);
+            let maxY = null;
 
-            const update = () => {
-                if (window.scrollY <= blocks.offsetHeight * .01) blocks.classList.remove('duplicated');
-                else if (window.scrollY > blocks.offsetHeight * TRIGGER) blocks.classList.add('duplicated');
+            // Wheel, touch and keys stop once the page reaches the limit...
+            const atLimit = () => window.scrollY >= maxY - 1;
+            const stop = (e) => {
+                if (atLimit() && (e.type !== 'wheel' || e.deltaY > 0)) e.preventDefault();
+            };
+            const stopKeys = (e) => {
+                if (atLimit() && SCROLL_KEYS.has(e.key) && !e.target.closest('input, textarea, select, button, [contenteditable]')) {
+                    e.preventDefault();
+                }
+            };
+            // ...and this catches anything they miss, like dragging the scrollbar
+            const hold = () => {
+                if (maxY !== null && window.scrollY > maxY) window.scrollTo(0, maxY);
             };
 
-            window.addEventListener('scroll', update, { passive: true });
-            update(); // the page may load already scrolled down
+            const unlock = () => {
+                if (maxY === null) return;
+                maxY = null;
+                window.removeEventListener('wheel', stop);
+                window.removeEventListener('touchmove', stop);
+                window.removeEventListener('keydown', stopKeys);
+                window.removeEventListener('scroll', hold);
+            };
+
+            const lock = () => {
+                maxY = window.scrollY + blocks.offsetHeight * SLACK;
+                window.addEventListener('wheel', stop, { passive: false });
+                window.addEventListener('touchmove', stop, { passive: false });
+                window.addEventListener('keydown', stopKeys);
+                window.addEventListener('scroll', hold);
+                // Free once the last copy is placed and deselected; the timer is a backstop
+                lastCopy.addEventListener('animationend', unlock, { once: true });
+                setTimeout(unlock, 2500);
+            };
+
+            const update = (fromScroll) => {
+                const isDuplicated = blocks.classList.contains('duplicated');
+                if (window.scrollY <= blocks.offsetHeight * .01) {
+                    blocks.classList.remove('duplicated');
+                } else if (window.scrollY > blocks.offsetHeight * TRIGGER && !isDuplicated) {
+                    blocks.classList.add('duplicated');
+                    if (fromScroll && !reduceMotion) lock();
+                }
+            };
+
+            window.addEventListener('scroll', () => update(true), { passive: true });
+            update(false); // the page may load already scrolled down
         })();
 
         // Sandbox: a small recreation of block duplication in the editor.

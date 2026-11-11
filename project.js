@@ -36,4 +36,11 @@
     };
 
     window.addHoverPlay();
+
+    // Touchscreens can't hover, so they tap instead
+    if (matchMedia('(hover: none)').matches) {
+        document.querySelectorAll('[data-play-hint]').forEach((hint) => {
+            hint.textContent = 'Tap to play';
+        });
+    }
 })();

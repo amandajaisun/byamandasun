@@ -134,6 +134,24 @@ main > :last-child {
     text-wrap: pretty;
 }
 
+/* The animation above a project. Every page uses the same box, so the
+   title below it starts at the same place on each one. Roomy, but the
+   whole opening still fits in the window */
+.project-opening {
+    height: clamp(480px, min(62vw, calc(100vh - 140px)), 800px);
+    max-width: 1280px;
+    margin-bottom: clamp(96px, 12vw, 160px);
+    display: grid;
+    place-items: center;
+}
+
+@media (max-width: 768px) {
+    .project-opening {
+        height: 440px;
+        margin-bottom: 64px;
+    }
+}
+
 /* Two columns: the project's name and links stay put on the left
    while everything else scrolls past on the right */
 .project-layout {
@@ -148,8 +166,10 @@ main > :last-child {
 }
 
 .project-rail {
+    /* Sticks at the same height it starts at (the body's top padding), so it
+       lines up with the content beside it instead of jumping down */
     position: sticky;
-    top: 200px;
+    top: 100px;
     margin-bottom: 0;
 
     /* One line, and small enough to leave the right column its room */
@@ -167,6 +187,7 @@ main > :last-child {
         & a {
             display: flex;
             gap: 0.3em;
+            padding-block: 4px;
         }
     }
 }
@@ -268,6 +289,14 @@ main > :last-child {
     display: block;
     border-radius: var(--media-radius);
     -webkit-tap-highlight-color: transparent;
+}
+
+/* "Hover to play" under hover-to-play videos; project.js says "Tap" on touch */
+.play-hint {
+    margin-top: 12px;
+    font-size: var(--size-small);
+    color: var(--accent);
+    text-align: center;
 }
 
 /* Shows what a click does: play while stopped, pause while playing */

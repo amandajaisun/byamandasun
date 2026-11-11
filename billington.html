@@ -3,7 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>tree — amanda sun</title>
+    <title>Window Tree — amanda sun</title>
+    <meta name="description" content="A generative tree, projected in windowless rooms, that sways with the wind outside.">
+    <link rel="canonical" href="https://byamandasun.com/billington.html">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <!-- Sharing preview -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="amanda sun">
+    <meta property="og:title" content="Window Tree — Amanda Sun">
+    <meta property="og:description" content="A generative tree, projected in windowless rooms, that sways with the wind outside.">
+    <meta property="og:url" content="https://byamandasun.com/billington.html">
+    <meta property="og:image" content="https://byamandasun.com/imgs/share/window-tree.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
@@ -12,28 +26,38 @@
     <script src="site.js" defer></script>
     <script src="project.js" defer></script>
     <style>
-        /* The tree stays behind the text from the details through "Inspiration" */
-        .tree-intro {
-            position: relative;
+        /* Opening: the tree grows first, in the shared opening box (project.css).
+           It stays pinned while the page scrolls up over it, fading
+           (--fade, set by the script below) so the text on top stays readable */
+        .tree-opening {
+            position: sticky;
+            top: 100px;
+            z-index: 0;
+            opacity: var(--fade, 1);
+            pointer-events: none;
         }
 
-        /* The tree growing. Its height follows the text it sits behind, and it
-           centers on that column. Lightened so the text stays readable, and
-           the video's background is slightly off white, so its edges fade out
+        /* The video's background is slightly off white, so its edges fade out
            to hide the box */
-        .backdrop-tree {
-            position: absolute;
-            z-index: -1;
-            top: 0;
-            left: 50%;
-            translate: -50% 0;
+        .opening-tree {
             height: 100%;
+            max-width: 100%;
             aspect-ratio: 980 / 900;
-            opacity: 0.5;
+            object-fit: contain;
             mask-image:
                 linear-gradient(to right, transparent, black 6%, black 94%, transparent),
                 linear-gradient(to bottom, transparent, black 6%, black 94%, transparent);
             mask-composite: intersect;
+        }
+
+        .tree-scroll > .project-layout {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* First thing beside the title, so it starts level with it */
+        .tree-intro > .details {
+            margin-top: 0;
         }
 
         /* Real trees on the left, the generated tree on the right */
@@ -69,14 +93,6 @@
         }
 
         @media (max-width: 768px) {
-            /* The tree is wider than a phone: let it reach the screen's edges,
-               then clip it there so the page can't scroll sideways */
-            .tree-intro {
-                margin-inline: -20px;
-                padding-inline: 20px;
-                overflow-x: clip;
-            }
-
             .steps { grid-template-columns: 1fr; gap: 56px; }
         }
     </style>
@@ -88,17 +104,24 @@
     <nav id="nav-pane" aria-label="pages">
         <a href="ux.html" class="nav-item active" data-key="2" aria-keyshortcuts="2">design</a>
         <a href="canvas.html" class="nav-item" data-key="3" aria-keyshortcuts="3">art</a>
-        <a href="links.html" class="nav-item" data-key="4" aria-keyshortcuts="4">press</a>
+        <a href="links.html" class="nav-item" data-key="4" aria-keyshortcuts="4">about</a>
     </nav>
 
     <!-- Signature -->
     <div id="signature"><a href="wind.html" class="nav-item" data-key="1" aria-label="amanda sun: home" aria-keyshortcuts="1">amanda sun</a></div>
 
     <main id="main" tabindex="-1">
+        <div class="tree-scroll">
+        <div class="tree-opening project-opening container">
+            <!-- Loops like a GIF: no pause button (click still pauses) -->
+            <video class="opening-tree" src="imgs/billington/tree-growing.mp4" autoplay loop muted playsinline data-no-pause-button
+                   aria-label="a generative tree growing branches and leaves, then swaying"></video>
+        </div>
+
         <div class="project-layout">
         <header class="hero project-rail">
             <p class="dateline">Stanford Billington Lab</p>
-            <h1>Tree</h1>
+            <h1>Window Tree</h1>
             <div class="project-links">
                 <a class="text-link prev-link" href="squarespace.html" aria-label="previous project"><span><span class="prev-arrow">←</span> prev</span></a>
                 <a class="text-link next-link" href="caltrain.html" aria-label="next project"><span>next</span> <span>→</span></a>
@@ -107,9 +130,6 @@
 
         <div class="project-body">
         <div class="tree-intro">
-            <!-- Loops like a GIF: no pause button (click still pauses) -->
-            <video class="backdrop-tree" src="imgs/billington/tree-growing.mp4" autoplay loop muted playsinline data-no-pause-button
-                   aria-label="a generative tree growing branches and leaves, then swaying"></video>
             <dl class="details">
                 <div>
                     <dt>Time:</dt>
@@ -153,6 +173,21 @@
         </ol>
         </div>
         </div>
+        </div>
     </main>
+
+    <script>
+        // The opening tree fades as the page scrolls over it, down to a faint
+        // backdrop by the time it's a screen's height up
+        (() => {
+            const opening = document.querySelector('.tree-opening');
+            const update = () => {
+                const progress = Math.min(Math.max(window.scrollY / opening.offsetHeight, 0), 1);
+                opening.style.setProperty('--fade', String(1 - progress * 0.85));
+            };
+            window.addEventListener('scroll', update, { passive: true });
+            update();
+        })();
+    </script>
 </body>
 </html>
