@@ -34,7 +34,8 @@ main > :last-child {
     margin-bottom: 0;
 }
 
-/* Hero: company, title and project links, then the details and overview */
+/* Hero: company, title and project links. .hero-top and the grid in .project-links
+   only serve an encrypted page that hasn't been rebuilt since the two-column layout */
 .hero {
     margin-bottom: var(--section-gap);
 }
@@ -131,6 +132,133 @@ main > :last-child {
     font-style: italic;
     line-height: 1.35;
     text-wrap: pretty;
+}
+
+/* Two columns: the project's name and links stay put on the left
+   while everything else scrolls past on the right */
+.project-layout {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: 64px;
+    align-items: start;
+    /* Room on the left (the body already pads 40px); the right edge stays
+       on the page width */
+    margin-left: calc(clamp(40px, 5.5vw, 80px) - 40px);
+    padding-right: max(0px, calc((100% - var(--page-width)) / 2));
+}
+
+.project-rail {
+    position: sticky;
+    top: 200px;
+    margin-bottom: 0;
+
+    /* One line, and small enough to leave the right column its room */
+    & h1 {
+        font-size: clamp(26px, 2.5vw, 36px);
+        white-space: nowrap;
+        margin-bottom: 32px;
+    }
+
+    & .project-links {
+        display: flex;
+        gap: 24px;
+        font-size: clamp(14px, 1.2vw, 16px);
+
+        & a {
+            display: flex;
+            gap: 0.3em;
+        }
+    }
+}
+
+/* Next and prev project lean toward where they go on hover: the words
+   slide that way, and the arrow pulls further ahead. Only the text moves,
+   so the link stays under the pointer */
+.next-link,
+.prev-link {
+    & span {
+        transition: translate 0.3s;
+    }
+
+    &:hover,
+    &:focus-visible {
+        font-weight: var(--weight-regular);
+    }
+}
+
+.next-link:is(:hover, :focus-visible) {
+    & span {
+        translate: 16px 0;
+    }
+
+    & span:last-child {
+        translate: 24px 0;
+    }
+}
+
+.prev-link {
+    --lean: 16px;
+    --arrow-lead: 8px;
+
+    & .prev-arrow {
+        display: inline-block;
+    }
+
+    &:is(:hover, :focus-visible) {
+        & > span {
+            translate: calc(var(--lean) * -1) 0;
+        }
+
+        /* Sits inside the moving words, so this adds to their slide */
+        & .prev-arrow {
+            translate: calc(var(--arrow-lead) * -1) 0;
+        }
+    }
+}
+
+/* The page margin is only 20px here, so lean less to stay on screen */
+@media (max-width: 768px) {
+    .prev-link {
+        --lean: 8px;
+        --arrow-lead: 4px;
+    }
+}
+
+.project-body {
+    justify-self: end;
+    width: min(100%, 756px);
+
+    & > :last-child {
+        margin-bottom: 0;
+    }
+
+    & > .details {
+        margin-top: 0;
+    }
+}
+
+/* Too narrow for two columns: back to one, with nothing pinned */
+@media (max-width: 900px) {
+    .project-layout {
+        display: block;
+        margin-left: 0;
+        padding-right: 0;
+    }
+
+    .project-rail {
+        position: static;
+        margin-bottom: 40px;
+
+        & h1 {
+            font-size: clamp(32px, 6vw, 66px);
+            white-space: normal;
+            margin-bottom: 24px;
+        }
+    }
+
+    .project-body {
+        width: auto;
+    }
 }
 
 /* Videos that play on hover: <video data-hover-play> (project.js adds the rest) */

@@ -12,14 +12,13 @@
     <script src="site.js" defer></script>
     <script src="project.js" defer></script>
     <style>
-        /* The tree stays behind the hero text, positioned against the hero */
-        .hero {
+        /* The tree stays behind the text from the details through "Inspiration" */
+        .tree-intro {
             position: relative;
         }
 
-        /* The tree growing, behind all the text from the title to "Inspiration".
-           Its height follows the hero, plus the gap and heading after it, and it
-           centers on the page. Lightened so the text stays readable, and
+        /* The tree growing. Its height follows the text it sits behind, and it
+           centers on that column. Lightened so the text stays readable, and
            the video's background is slightly off white, so its edges fade out
            to hide the box */
         .backdrop-tree {
@@ -28,7 +27,7 @@
             top: 0;
             left: 50%;
             translate: -50% 0;
-            height: calc((100% + 96px) / 0.72);
+            height: 100%;
             aspect-ratio: 980 / 900;
             opacity: 0.5;
             mask-image:
@@ -72,7 +71,7 @@
         @media (max-width: 768px) {
             /* The tree is wider than a phone: let it reach the screen's edges,
                then clip it there so the page can't scroll sideways */
-            .hero {
+            .tree-intro {
                 margin-inline: -20px;
                 padding-inline: 20px;
                 overflow-x: clip;
@@ -93,23 +92,24 @@
     </nav>
 
     <!-- Signature -->
-    <div id="signature"><a href="index.html" class="nav-item" data-key="1" aria-label="amanda sun: home" aria-keyshortcuts="1">amanda sun</a></div>
+    <div id="signature"><a href="wind.html" class="nav-item" data-key="1" aria-label="amanda sun: home" aria-keyshortcuts="1">amanda sun</a></div>
 
-    <main id="main" class="container" tabindex="-1">
-        <header class="hero">
+    <main id="main" tabindex="-1">
+        <div class="project-layout">
+        <header class="hero project-rail">
+            <p class="dateline">Stanford Billington Lab</p>
+            <h1>Tree</h1>
+            <div class="project-links">
+                <a class="text-link prev-link" href="squarespace.html" aria-label="previous project"><span><span class="prev-arrow">←</span> prev</span></a>
+                <a class="text-link next-link" href="caltrain.html" aria-label="next project"><span>next</span> <span>→</span></a>
+            </div>
+        </header>
+
+        <div class="project-body">
+        <div class="tree-intro">
             <!-- Loops like a GIF: no pause button (click still pauses) -->
             <video class="backdrop-tree" src="imgs/billington/tree-growing.mp4" autoplay loop muted playsinline data-no-pause-button
                    aria-label="a generative tree growing branches and leaves, then swaying"></video>
-            <div class="hero-top">
-                <div>
-                    <p class="dateline">Stanford Billington Lab</p>
-                    <h1>Tree</h1>
-                </div>
-                <div class="project-links">
-                    <a class="text-link" href="caltrain.html"><span class="link-start">next</span> <span>project</span> <span>→</span></a>
-                    <a class="text-link" href="squarespace.html"><span class="link-start">← prev</span> <span>project</span></a>
-                </div>
-            </div>
             <dl class="details">
                 <div>
                     <dt>Time:</dt>
@@ -124,18 +124,18 @@
                     <dd>Basma Altaif</dd>
                 </div>
             </dl>
-            <div class="prose">
+            <section class="prose">
                 <h2>Overview</h2>
                 <p>Windowless rooms are endemic in our buildings and have real, negative impacts on their inhabitants.</p>
                 <p>Under Basma Altaif, Sarah Billington, and Elizabeth Murnane, I translated a biophilic research paper’s discoveries into <a class="text-link" href="https://processing.org" target="_blank">Processing<span class="visually-hidden"> (opens in a new tab)</span></a> code.</p>
-            </div>
-        </header>
+            </section>
 
         <section class="prose">
             <h2>Inspiration</h2>
             <blockquote class="quote">“Can natural cues in windowless rooms help humans tell time?”</blockquote>
             <p>Our goal was to measure this through a projection of a tree whose branches moved with the same wind speed that was recorded outside. Thus, we had to create an auto-generative tree that could change, have a dynamic wind speed, and have multiple iterations.</p>
         </section>
+        </div>
 
         <ol class="steps">
             <li class="step">
@@ -151,6 +151,8 @@
                 <p class="step-description">Processing picks up the information via wifi, and changes the animation projected indoors to match the changing conditions outside.</p>
             </li>
         </ol>
+        </div>
+        </div>
     </main>
 </body>
 </html>
